@@ -1,53 +1,15 @@
 [
   {
-    "id": "1756123317028",
+    "id": "1756123485512",
     "name": "Test",
     "description": "test",
     "genre": "test",
     "completed": false,
-    "createdAt": "2025-08-25T12:01:57.028Z",
-    "updatedAt": "2025-08-25T12:01:57.028Z",
+    "createdAt": "2025-08-25T12:04:45.512Z",
+    "updatedAt": "2025-08-25T12:04:45.512Z",
     "issues": {
-      "bug": [
-        {
-          "id": "1756123339315",
-          "title": "Movement issue",
-          "description": "test",
-          "category": "bug",
-          "priority": "medium",
-          "urgency": "medium",
-          "assignee": "",
-          "status": "open",
-          "createdAt": "2025-08-25T12:02:19.315Z",
-          "updatedAt": "2025-08-25T12:02:19.315Z"
-        }
-      ],
-      "controls": [
-        {
-          "id": "1756123364823",
-          "title": "control ",
-          "description": "it was broke",
-          "category": "controls",
-          "priority": "high",
-          "urgency": "high",
-          "assignee": "",
-          "status": "open",
-          "createdAt": "2025-08-25T12:02:44.823Z",
-          "updatedAt": "2025-08-25T12:02:44.823Z"
-        },
-        {
-          "id": "1756123468661",
-          "title": "Movement issue",
-          "description": "",
-          "category": "controls",
-          "priority": "medium",
-          "urgency": "medium",
-          "assignee": "1756123446705",
-          "status": "open",
-          "createdAt": "2025-08-25T12:04:28.661Z",
-          "updatedAt": "2025-08-25T12:04:28.661Z"
-        }
-      ],
+      "bug": [],
+      "controls": [],
       "quest": [],
       "review": []
     }
