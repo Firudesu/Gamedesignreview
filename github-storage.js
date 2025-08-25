@@ -1,16 +1,35 @@
 // GitHub Storage System for Game Design Review
 class GitHubStorage {
     constructor() {
-        // Remove hardcoded token for security - will be set via environment or user input
-        this.token = null;
+        // Use Netlify environment variable for GitHub token
+        this.token = this.getGitHubToken();
         this.owner = 'Firudesu';
         this.repo = 'game-review-data';
         this.baseUrl = 'https://api.github.com';
     }
 
-    // Method to set token (called after user provides it)
+    // Get GitHub token from Netlify environment variable or fallback to localStorage
+    getGitHubToken() {
+        // Try to get from Netlify environment variable first
+        if (typeof process !== 'undefined' && process.env && process.env.GITHUB_TOKEN) {
+            return process.env.GITHUB_TOKEN;
+        }
+        
+        // Fallback to localStorage (for development)
+        const storedToken = localStorage.getItem('github_token');
+        if (storedToken) {
+            return storedToken;
+        }
+        
+        // If no token found, show error
+        console.error('GitHub token not found. Please set GITHUB_TOKEN environment variable in Netlify.');
+        return null;
+    }
+
+    // Method to set token (for development/testing)
     setToken(token) {
         this.token = token;
+        localStorage.setItem('github_token', token);
     }
 
     // Check if token is available
@@ -148,22 +167,12 @@ class GameManagerWithGitHub {
     async init() {
         console.log('Initializing GameManagerWithGitHub...');
         
-        // Check if token is already stored in localStorage
-        let token = localStorage.getItem('github_token');
-        
-        if (!token) {
-            // Prompt user for token
-            token = prompt('Please enter your GitHub Personal Access Token:');
-            if (token) {
-                localStorage.setItem('github_token', token);
-            } else {
-                console.error('GitHub token is required for this application to work.');
-                this.showNotification('GitHub token is required. Please refresh and enter your token.', 'error');
-                return;
-            }
+        // Check if token is available
+        if (!this.storage.hasToken()) {
+            console.error('GitHub token not available. Please configure GITHUB_TOKEN environment variable in Netlify.');
+            this.showNotification('GitHub token not configured. Please contact administrator.', 'error');
+            return;
         }
-        
-        this.storage.setToken(token);
         
         this.setupEventListeners();
         await this.loadData();

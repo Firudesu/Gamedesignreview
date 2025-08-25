@@ -4,84 +4,638 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Design Review System</title>
-    <link rel="stylesheet" href="game-review-styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            color: #1e293b;
+            font-size: 2.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.875rem 1.75rem;
+            border: none;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.9);
+            color: #475569;
+            border: 1px solid rgba(203, 213, 225, 0.5);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            background: #ffffff;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.6);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.6);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            height: fit-content;
+        }
+
+        .sidebar-section {
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-section h3 {
+            color: #1e293b;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .category-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .category-btn {
+            padding: 0.75rem 1rem;
+            border: none;
+            border-radius: 0.75rem;
+            background: rgba(248, 250, 252, 0.8);
+            color: #64748b;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .category-btn:hover {
+            background: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
+            transform: translateX(5px);
+        }
+
+        .category-btn.active {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .category-btn.completed {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .main-area {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(226, 232, 240, 0.5);
+        }
+
+        .category-title {
+            color: #1e293b;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .tasks-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .task-card {
+            background: rgba(248, 250, 252, 0.8);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 1px solid rgba(226, 232, 240, 0.5);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .task-card:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .task-card.completed {
+            opacity: 0.7;
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .task-card.completed::before {
+            content: '✓';
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #10b981;
+            color: white;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .task-title {
+            color: #1e293b;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .task-priority {
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .task-priority.critical {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+
+        .task-priority.high {
+            background: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+        }
+
+        .task-priority.medium {
+            background: rgba(59, 130, 246, 0.1);
+            color: #2563eb;
+        }
+
+        .task-priority.low {
+            background: rgba(34, 197, 94, 0.1);
+            color: #16a34a;
+        }
+
+        .task-assignee {
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        .task-description {
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
+        }
+
+        .task-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .task-btn.complete {
+            background: #10b981;
+            color: white;
+        }
+
+        .task-btn.complete:hover {
+            background: #059669;
+        }
+
+        .task-btn.reopen {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .task-btn.reopen:hover {
+            background: #2563eb;
+        }
+
+        .task-btn.delete {
+            background: #ef4444;
+            color: white;
+        }
+
+        .task-btn.delete:hover {
+            background: #dc2626;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(226, 232, 240, 0.5);
+        }
+
+        .modal-header h2 {
+            color: #1e293b;
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.75rem;
+            cursor: pointer;
+            color: #64748b;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            width: 3rem;
+            height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            background: rgba(241, 245, 249, 0.8);
+            color: #1e293b;
+            transform: rotate(90deg);
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.75rem;
+            color: #374151;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid rgba(203, 213, 225, 0.5);
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            background: #ffffff;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2.5rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid rgba(226, 232, 240, 0.5);
+        }
+
+        .notification {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            color: white;
+            font-weight: 600;
+            z-index: 10000;
+            animation: slideInRight 0.3s ease;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #64748b;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #475569;
+        }
+
+        .empty-state p {
+            color: #94a3b8;
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                padding: 1rem;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 1.5rem;
+                text-align: center;
+            }
+
+            .header h1 {
+                font-size: 1.75rem;
+            }
+
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .sidebar {
+                order: 2;
+            }
+
+            .main-area {
+                order: 1;
+            }
+
+            .modal-content {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="app-container">
         <!-- Header -->
         <header class="header">
-            <div class="header-content">
-                <h1><i class="fas fa-gamepad"></i> Game Design Review</h1>
-                <div class="header-actions">
-                    <button id="syncBtn" class="btn btn-primary">
-                        <i class="fas fa-sync"></i> Sync with Sheets
-                    </button>
-                    <button id="settingsBtn" class="btn btn-secondary">
-                        <i class="fas fa-cog"></i> Settings
-                    </button>
-                </div>
+            <h1><i class="fas fa-gamepad"></i> <span id="gameTitle">Game Design Review</span></h1>
+            <div class="header-actions">
+                <button id="backBtn" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Games
+                </button>
+                <button id="addTaskBtn" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add Task
+                </button>
             </div>
         </header>
 
         <!-- Main Content -->
-        <main class="main-content">
+        <div class="main-content">
             <!-- Sidebar -->
             <aside class="sidebar">
                 <div class="sidebar-section">
-                    <h3>Quick Actions</h3>
-                    <button id="newIssueBtn" class="btn btn-primary btn-full">
-                        <i class="fas fa-plus"></i> New Issue
-                    </button>
-                    <button id="uploadMediaBtn" class="btn btn-secondary btn-full">
-                        <i class="fas fa-upload"></i> Upload Media
-                    </button>
-                </div>
-
-                <div class="sidebar-section">
-                    <h3>Filters</h3>
-                    <div class="filter-group">
-                        <label>Status:</label>
-                        <select id="statusFilter" class="filter-select">
-                            <option value="all">All Status</option>
-                            <option value="open">Open</option>
-                            <option value="in-progress">In Progress</option>
-                            <option value="review">Under Review</option>
-                            <option value="completed">Completed</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>Priority:</label>
-                        <select id="priorityFilter" class="filter-select">
-                            <option value="all">All Priorities</option>
-                            <option value="critical">Critical</option>
-                            <option value="high">High</option>
-                            <option value="medium">Medium</option>
-                            <option value="low">Low</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>Assignee:</label>
-                        <select id="assigneeFilter" class="filter-select">
-                            <option value="all">All Assignees</option>
-                        </select>
+                    <h3><i class="fas fa-list"></i> Categories</h3>
+                    <div class="category-nav">
+                        <button class="category-btn active" data-category="all">
+                            <i class="fas fa-th-list"></i> All Issues
+                        </button>
+                        <button class="category-btn" data-category="bug">
+                            <i class="fas fa-bug"></i> Bugs
+                        </button>
+                        <button class="category-btn" data-category="controls">
+                            <i class="fas fa-gamepad"></i> Controls
+                        </button>
+                        <button class="category-btn" data-category="quest">
+                            <i class="fas fa-quest"></i> Quests
+                        </button>
+                        <button class="category-btn" data-category="review">
+                            <i class="fas fa-star"></i> Reviews
+                        </button>
                     </div>
                 </div>
 
                 <div class="sidebar-section">
-                    <h3>Statistics</h3>
+                    <h3><i class="fas fa-chart-bar"></i> Statistics</h3>
                     <div class="stats-grid">
                         <div class="stat-item">
-                            <span class="stat-number" id="totalIssues">0</span>
-                            <span class="stat-label">Total Issues</span>
+                            <span class="stat-number" id="totalTasks">0</span>
+                            <span class="stat-label">Total Tasks</span>
                         </div>
                         <div class="stat-item">
-                            <span class="stat-number" id="openIssues">0</span>
+                            <span class="stat-number" id="openTasks">0</span>
                             <span class="stat-label">Open</span>
                         </div>
                         <div class="stat-item">
-                            <span class="stat-number" id="completedIssues">0</span>
+                            <span class="stat-number" id="completedTasks">0</span>
                             <span class="stat-label">Completed</span>
                         </div>
                     </div>
@@ -90,216 +644,139 @@
 
             <!-- Main Area -->
             <div class="main-area">
-                <!-- Issues List -->
-                <div class="issues-container">
-                    <div class="issues-header">
-                        <h2>Design Review Issues</h2>
-                        <div class="issues-actions">
-                            <input type="text" id="searchIssues" placeholder="Search issues..." class="search-input">
-                            <button id="exportBtn" class="btn btn-secondary">
-                                <i class="fas fa-download"></i> Export
-                            </button>
-                        </div>
-                    </div>
-                    <div id="issuesList" class="issues-list">
-                        <!-- Issues will be populated here -->
-                    </div>
+                <div class="category-header">
+                    <h2 id="categoryTitle">All Issues</h2>
+                </div>
+
+                <div id="tasksContainer" class="tasks-container">
+                    <!-- Tasks will be populated here -->
+                </div>
+
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <i class="fas fa-clipboard-list"></i>
+                    <h3>No tasks yet</h3>
+                    <p>Create your first task to get started</p>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
 
-    <!-- Modals -->
-    <!-- New Issue Modal -->
-    <div id="newIssueModal" class="modal">
+    <!-- Add Task Modal -->
+    <div id="addTaskModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Create New Issue</h3>
-                <button class="modal-close">&times;</button>
+                <h2>Add New Task</h2>
+                <button class="close-btn" onclick="closeModal('addTaskModal')">&times;</button>
             </div>
-            <div class="modal-body">
-                <form id="newIssueForm">
-                    <div class="form-group">
-                        <label for="issueTitle">Title *</label>
-                        <input type="text" id="issueTitle" required>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="issuePriority">Priority</label>
-                            <select id="issuePriority">
-                                <option value="low">Low</option>
-                                <option value="medium" selected>Medium</option>
-                                <option value="high">High</option>
-                                <option value="critical">Critical</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="issueAssignee">Assignee</label>
-                            <select id="issueAssignee">
-                                <option value="">Unassigned</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="issueDescription">Description</label>
-                        <textarea id="issueDescription" rows="4"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="issueCategory">Category</label>
-                        <select id="issueCategory">
-                            <option value="ui">UI/UX</option>
-                            <option value="gameplay">Gameplay</option>
-                            <option value="art">Art/Visual</option>
-                            <option value="audio">Audio</option>
-                            <option value="performance">Performance</option>
-                            <option value="bug">Bug</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Attachments</label>
-                        <div class="file-upload-area" id="fileUploadArea">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                            <p>Drag & drop files here or click to browse</p>
-                            <input type="file" id="fileInput" multiple accept="image/*,video/*" style="display: none;">
-                        </div>
-                        <div id="filePreview" class="file-preview"></div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" id="cancelIssue">Cancel</button>
-                <button type="submit" class="btn btn-primary" form="newIssueForm">Create Issue</button>
-            </div>
+            <form id="addTaskForm">
+                <div class="form-group">
+                    <label for="taskTitle">Task Title</label>
+                    <input type="text" id="taskTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="taskDescription">Description</label>
+                    <textarea id="taskDescription" placeholder="Describe the task..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="taskCategory">Category</label>
+                    <select id="taskCategory" required>
+                        <option value="bug">Bug</option>
+                        <option value="controls">Controls</option>
+                        <option value="quest">Quest</option>
+                        <option value="review">Review</option>
+                    </select>
+                </div>
+                <div class="form-group" id="priorityGroup" style="display: none;">
+                    <label for="taskPriority">Priority</label>
+                    <select id="taskPriority">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                        <option value="critical">Critical</option>
+                    </select>
+                </div>
+                <div class="form-group" id="urgencyGroup" style="display: none;">
+                    <label for="taskUrgency">Urgency</label>
+                    <select id="taskUrgency">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                        <option value="critical">Critical</option>
+                    </select>
+                </div>
+                <div class="form-group" id="assigneeGroup" style="display: none;">
+                    <label for="taskAssignee">Assignee</label>
+                    <select id="taskAssignee">
+                        <option value="">Unassigned</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addTaskModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Task</button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <!-- Issue Detail Modal -->
-    <div id="issueDetailModal" class="modal">
-        <div class="modal-content modal-large">
-            <div class="modal-header">
-                <h3 id="detailIssueTitle">Issue Title</h3>
-                <button class="modal-close">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="issue-detail-content">
-                    <div class="issue-info">
-                        <div class="issue-meta">
-                            <span class="issue-status" id="detailIssueStatus">Open</span>
-                            <span class="issue-priority" id="detailIssuePriority">Medium</span>
-                            <span class="issue-assignee" id="detailIssueAssignee">Unassigned</span>
-                        </div>
-                        <div class="issue-description" id="detailIssueDescription">
-                            Issue description will appear here...
-                        </div>
-                    </div>
-                    <div class="issue-media">
-                        <h4>Media & Annotations</h4>
-                        <div id="mediaContainer" class="media-container">
-                            <!-- Media items will be displayed here -->
-                        </div>
-                    </div>
-                    <div class="issue-comments">
-                        <h4>Comments</h4>
-                        <div id="commentsList" class="comments-list">
-                            <!-- Comments will be displayed here -->
-                        </div>
-                        <div class="comment-form">
-                            <textarea id="newComment" placeholder="Add a comment..."></textarea>
-                            <button id="addCommentBtn" class="btn btn-primary">Add Comment</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" id="closeDetail">Close</button>
-                <button type="button" class="btn btn-primary" id="markComplete">Mark Complete</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Image Annotation Modal -->
-    <div id="annotationModal" class="modal">
-        <div class="modal-content modal-full">
-            <div class="modal-header">
-                <h3>Image Annotation</h3>
-                <div class="annotation-tools">
-                    <button id="drawTool" class="tool-btn active" title="Draw">
-                        <i class="fas fa-pen"></i>
-                    </button>
-                    <button id="arrowTool" class="tool-btn" title="Arrow">
-                        <i class="fas fa-arrow-right"></i>
-                    </button>
-                    <button id="textTool" class="tool-btn" title="Text">
-                        <i class="fas fa-font"></i>
-                    </button>
-                    <button id="circleTool" class="tool-btn" title="Circle">
-                        <i class="fas fa-circle"></i>
-                    </button>
-                    <button id="rectTool" class="tool-btn" title="Rectangle">
-                        <i class="fas fa-square"></i>
-                    </button>
-                    <input type="color" id="colorPicker" value="#ff0000" title="Color">
-                    <input type="range" id="brushSize" min="1" max="20" value="3" title="Brush Size">
-                    <button id="clearCanvas" class="tool-btn" title="Clear">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-                <button class="modal-close">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="annotation-container">
-                    <canvas id="annotationCanvas"></canvas>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" id="cancelAnnotation">Cancel</button>
-                <button type="button" class="btn btn-primary" id="saveAnnotation">Save Annotation</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Settings Modal -->
-    <div id="settingsModal" class="modal">
+    <!-- Task Detail Modal -->
+    <div id="taskDetailModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Settings</h3>
-                <button class="modal-close">&times;</button>
+                <h2 id="detailTaskTitle">Task Title</h2>
+                <button class="close-btn" onclick="closeModal('taskDetailModal')">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="settings-section">
-                    <h4>Google Sheets Integration</h4>
-                    <div class="form-group">
-                        <label for="sheetsApiKey">API Key</label>
-                        <input type="password" id="sheetsApiKey" placeholder="Enter your Google Sheets API key">
+                <div class="task-detail-content">
+                    <div class="task-info">
+                        <div class="task-meta">
+                            <span class="task-status" id="detailTaskStatus">Open</span>
+                            <span class="task-priority" id="detailTaskPriority">Medium</span>
+                            <span class="task-assignee" id="detailTaskAssignee">Unassigned</span>
+                        </div>
+                        <div class="task-description" id="detailTaskDescription">
+                            Task description will appear here...
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="spreadsheetId">Spreadsheet ID</label>
-                        <input type="text" id="spreadsheetId" placeholder="Enter spreadsheet ID">
-                        <small>Found in the URL: https://docs.google.com/spreadsheets/d/[SPREADSHEET_ID]/edit</small>
-                    </div>
-                    <button id="testConnectionBtn" class="btn btn-secondary">Test Connection</button>
-                </div>
-                <div class="settings-section">
-                    <h4>Team Members</h4>
-                    <div id="teamMembersList" class="team-members-list">
-                        <!-- Team members will be listed here -->
-                    </div>
-                    <button id="addTeamMemberBtn" class="btn btn-secondary">Add Team Member</button>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" id="cancelSettings">Cancel</button>
-                <button type="button" class="btn btn-primary" id="saveSettings">Save Settings</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal('taskDetailModal')">Close</button>
+                <button type="button" class="btn btn-success" id="markCompleteBtn" style="display: none;">
+                    <i class="fas fa-check"></i> Mark as Complete
+                </button>
+                <button type="button" class="btn btn-primary" id="reopenTaskBtn" style="display: none;">
+                    <i class="fas fa-undo"></i> Reopen Task
+                </button>
+                <button type="button" class="btn btn-danger" id="deleteTaskBtn">
+                    <i class="fas fa-trash"></i> Delete Task
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Hidden file input for media upload -->
-    <input type="file" id="mediaFileInput" multiple accept="image/*,video/*" style="display: none;">
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteTaskModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Delete Task</h2>
+                <button class="close-btn" onclick="closeModal('deleteTaskModal')">&times;</button>
+            </div>
+            <div style="padding: 1rem 0;">
+                <p style="color: #64748b; margin-bottom: 1.5rem; line-height: 1.6;">
+                    Are you sure you want to delete "<span id="deleteTaskName" style="font-weight: 600; color: #1e293b;"></span>"? 
+                    This action cannot be undone.
+                </p>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('deleteTaskModal')">Cancel</button>
+                <button type="button" class="btn btn-danger" onclick="taskManager.confirmDeleteTask()">
+                    <i class="fas fa-trash"></i> Delete Task
+                </button>
+            </div>
+        </div>
+    </div>
 
-    <!-- Scripts -->
-    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="github-storage.js"></script>
     <script src="game-review.js"></script>
 </body>
 </html>
