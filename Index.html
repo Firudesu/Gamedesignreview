@@ -17,166 +17,687 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
         }
 
-        .container {
-            background: #ffffff;
-            border-radius: 1rem;
-            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            width: 100%;
-            overflow: hidden;
-            text-align: center;
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
         }
 
         .header {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-            color: #ffffff;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             padding: 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .header h1 {
-            font-size: 2rem;
+            color: #1e293b;
+            font-size: 2.25rem;
             font-weight: 700;
-            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        .header p {
-            opacity: 0.9;
-            font-size: 1.1rem;
-        }
-
-        .content {
-            padding: 2rem;
+        .header-actions {
+            display: flex;
+            gap: 1rem;
         }
 
         .btn {
-            display: inline-block;
-            padding: 1rem 2rem;
-            margin: 0.5rem;
+            padding: 0.875rem 1.75rem;
             border: none;
-            border-radius: 0.5rem;
+            border-radius: 0.75rem;
             font-size: 1rem;
-            font-weight: 500;
-            text-decoration: none;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.9);
+            color: #475569;
+            border: 1px solid rgba(203, 213, 225, 0.5);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            background: #ffffff;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.6);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.6);
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .game-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .game-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .game-card.completed {
+            opacity: 0.7;
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .game-card.completed::before {
+            background: linear-gradient(90deg, #10b981, #059669);
+            transform: scaleX(1);
+        }
+
+        .game-card h3 {
+            color: #1e293b;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            display: flex;
             align-items: center;
             gap: 0.5rem;
         }
 
-        .btn-primary {
-            background: #3b82f6;
-            color: #ffffff;
+        .game-card.completed h3::after {
+            content: '✓';
+            color: #10b981;
+            font-size: 1.25rem;
+            margin-left: auto;
         }
 
-        .btn-primary:hover {
-            background: #2563eb;
+        .game-description {
+            color: #64748b;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
         }
 
-        .btn-secondary {
-            background: #f1f5f9;
-            color: #475569;
-            border: 1px solid #cbd5e1;
+        .game-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 1.5rem 0;
         }
 
-        .btn-secondary:hover {
-            background: #e2e8f0;
+        .stat {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(248, 250, 252, 0.8);
+            border-radius: 1rem;
+            border: 1px solid rgba(226, 232, 240, 0.5);
+            transition: all 0.3s ease;
         }
 
-        .features {
-            margin: 2rem 0;
-            text-align: left;
+        .stat:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px);
         }
 
-        .features h3 {
-            color: #1e293b;
-            margin-bottom: 1rem;
+        .stat-number {
+            display: block;
+            font-size: 2rem;
+            font-weight: 800;
+            color: #3b82f6;
+            margin-bottom: 0.25rem;
+            text-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
         }
 
-        .feature-list {
-            list-style: none;
+        .stat-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
-        .feature-list li {
-            padding: 0.5rem 0;
+        .game-categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .category-tag {
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            color: #3730a3;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .category-tag:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .game-actions {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .game-card:hover .game-actions {
+            opacity: 1;
+        }
+
+        .action-btn {
+            width: 2.5rem;
+            height: 2.5rem;
+            border: none;
+            border-radius: 0.75rem;
+            cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            color: #374151;
+            justify-content: center;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
         }
 
-        .feature-list li i {
-            color: #10b981;
+        .action-btn.complete {
+            background: rgba(16, 185, 129, 0.9);
+            color: white;
+        }
+
+        .action-btn.complete:hover {
+            background: #10b981;
+            transform: scale(1.1);
+        }
+
+        .action-btn.delete {
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+        }
+
+        .action-btn.delete:hover {
+            background: #ef4444;
+            transform: scale(1.1);
+        }
+
+        .empty-state {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 4rem 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .empty-state i {
+            font-size: 5rem;
+            color: #cbd5e1;
+            margin-bottom: 1.5rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .empty-state h3 {
+            color: #64748b;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .empty-state p {
+            color: #94a3b8;
+            margin-bottom: 2rem;
             font-size: 1.1rem;
         }
 
-        .footer {
-            padding: 1rem;
-            border-top: 1px solid #e2e8f0;
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(226, 232, 240, 0.5);
+        }
+
+        .modal-header h2 {
+            color: #1e293b;
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.75rem;
+            cursor: pointer;
             color: #64748b;
-            font-size: 0.875rem;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            width: 3rem;
+            height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            background: rgba(241, 245, 249, 0.8);
+            color: #1e293b;
+            transform: rotate(90deg);
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.75rem;
+            color: #374151;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid rgba(203, 213, 225, 0.5);
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            background: #ffffff;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2.5rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid rgba(226, 232, 240, 0.5);
+        }
+
+        .notification {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            color: white;
+            font-weight: 600;
+            z-index: 10000;
+            animation: slideInRight 0.3s ease;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                padding: 1rem;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 1.5rem;
+                text-align: center;
+            }
+
+            .header h1 {
+                font-size: 1.75rem;
+            }
+
+            .games-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .game-stats {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.75rem;
+            }
+
+            .stat {
+                padding: 0.75rem;
+            }
+
+            .stat-number {
+                font-size: 1.5rem;
+            }
+
+            .modal-content {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
             <h1><i class="fas fa-gamepad"></i> Game Design Review System</h1>
-            <p>Streamline your game design review process</p>
+            <div class="header-actions">
+                <button id="addGameBtn" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add Game
+                </button>
+                <button id="addMemberBtn" class="btn btn-secondary">
+                    <i class="fas fa-user-plus"></i> Add Member
+                </button>
+            </div>
+        </header>
+
+        <!-- Games Grid -->
+        <div id="gamesContainer">
+            <!-- Games will be populated here -->
         </div>
 
-        <div class="content">
-            <div class="features">
-                <h3>What you can do:</h3>
-                <ul class="feature-list">
-                    <li><i class="fas fa-check"></i> Create and manage design review issues</li>
-                    <li><i class="fas fa-check"></i> Upload screenshots and videos</li>
-                    <li><i class="fas fa-check"></i> Draw annotations on images</li>
-                    <li><i class="fas fa-check"></i> Sync with Google Sheets</li>
-                    <li><i class="fas fa-check"></i> Assign tasks to team members</li>
-                    <li><i class="fas fa-check"></i> Track progress and completion</li>
-                </ul>
-            </div>
-
-            <div class="actions">
-                <a href="setup.html" class="btn btn-primary">
-                    <i class="fas fa-rocket"></i> Get Started
-                </a>
-                <a href="game-design-review.html" class="btn btn-secondary">
-                    <i class="fas fa-play"></i> Launch App
-                </a>
-                <a href="demo.html" class="btn btn-secondary">
-                    <i class="fas fa-eye"></i> View Demo
-                </a>
-            </div>
-        </div>
-
-        <div class="footer">
-            <p>Choose an option above to get started with your game design reviews</p>
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <i class="fas fa-gamepad"></i>
+            <h3>No games yet</h3>
+            <p>Create your first game to get started with design reviews</p>
+            <button id="createFirstGameBtn" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Create First Game
+            </button>
         </div>
     </div>
 
+    <!-- Add Game Modal -->
+    <div id="addGameModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Game</h2>
+                <button class="close-btn" onclick="closeModal('addGameModal')">&times;</button>
+            </div>
+            <form id="addGameForm">
+                <div class="form-group">
+                    <label for="gameName">Game Name</label>
+                    <input type="text" id="gameName" required>
+                </div>
+                <div class="form-group">
+                    <label for="gameDescription">Description</label>
+                    <textarea id="gameDescription" placeholder="Brief description of the game..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="gameGenre">Genre</label>
+                    <input type="text" id="gameGenre" placeholder="e.g., Action, RPG, Strategy">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addGameModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Game</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Member Modal -->
+    <div id="addMemberModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add Team Member</h2>
+                <button class="close-btn" onclick="closeModal('addMemberModal')">&times;</button>
+            </div>
+            <form id="addMemberForm">
+                <div class="form-group">
+                    <label for="memberName">Name</label>
+                    <input type="text" id="memberName" required>
+                </div>
+                <div class="form-group">
+                    <label for="memberRole">Role</label>
+                    <input type="text" id="memberRole" placeholder="e.g., Designer, Developer, Artist">
+                </div>
+                <div class="form-group">
+                    <label for="memberEmail">Email</label>
+                    <input type="email" id="memberEmail" placeholder="optional">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addMemberModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Member</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteGameModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Delete Game</h2>
+                <button class="close-btn" onclick="closeModal('deleteGameModal')">&times;</button>
+            </div>
+            <div style="padding: 1rem 0;">
+                <p style="color: #64748b; margin-bottom: 1.5rem; line-height: 1.6;">
+                    Are you sure you want to delete "<span id="deleteGameName" style="font-weight: 600; color: #1e293b;"></span>"? 
+                    This action cannot be undone and will permanently remove all associated tasks.
+                </p>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('deleteGameModal')">Cancel</button>
+                <button type="button" class="btn btn-danger" onclick="window.gameManager.confirmDeleteGame()">
+                    <i class="fas fa-trash"></i> Delete Game
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="github-storage.js"></script>
     <script>
-        // Check if user has already set up the system
-        window.addEventListener('load', () => {
-            const hasSettings = localStorage.getItem('gameReviewSettings');
-            const hasTeamMembers = localStorage.getItem('gameReviewTeamMembers');
+        // Wait for DOM to be fully loaded before initializing
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('DOM loaded, initializing GameManagerWithGitHub...');
             
-            if (hasSettings && hasTeamMembers) {
-                // User has already set up, suggest going directly to app
-                const setupBtn = document.querySelector('a[href="setup.html"]');
-                if (setupBtn) {
-                    setupBtn.innerHTML = '<i class="fas fa-cog"></i> Settings';
-                    setupBtn.href = 'game-design-review.html#settings';
+            try {
+                // Check if the class exists
+                if (typeof GameManagerWithGitHub === 'undefined') {
+                    console.error('GameManagerWithGitHub class not found!');
+                    return;
                 }
+                
+                console.log('GameManagerWithGitHub class found, creating instance...');
+                
+                // Initialize the game manager with GitHub storage
+                window.gameManager = new GameManagerWithGitHub();
+                
+                console.log('Instance created, checking if init method exists...');
+                
+                if (typeof window.gameManager.init !== 'function') {
+                    console.error('init method not found on gameManager!');
+                    console.log('Available methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(window.gameManager)));
+                    return;
+                }
+                
+                console.log('init method found, calling it...');
+                
+                // Wait for initialization to complete
+                await window.gameManager.init();
+                
+                console.log('GameManagerWithGitHub initialization complete');
+            } catch (error) {
+                console.error('Error during initialization:', error);
             }
         });
+        
+        // Global functions
+        function closeModal(modalId) {
+            if (window.gameManager) {
+                window.gameManager.closeModal(modalId);
+            }
+        }
     </script>
 </body>
 </html>
