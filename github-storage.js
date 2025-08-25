@@ -1,29 +1,52 @@
 // GitHub Storage System for Game Design Review
 class GitHubStorage {
     constructor() {
-        // Use Netlify environment variable for GitHub token
-        this.token = this.getGitHubToken();
+        this.token = null;
         this.owner = 'Firudesu';
         this.repo = 'game-review-data';
         this.baseUrl = 'https://api.github.com';
     }
 
-    // Get GitHub token from Netlify environment variable or fallback to localStorage
-    getGitHubToken() {
-        // Try to get from Netlify environment variable first
-        if (typeof process !== 'undefined' && process.env && process.env.GITHUB_TOKEN) {
-            return process.env.GITHUB_TOKEN;
+    // Get GitHub token from Netlify serverless function
+    async getGitHubToken() {
+        // Check if we already have a token
+        if (this.token) {
+            return this.token;
         }
-        
-        // Fallback to localStorage (for development)
+
+        // Check localStorage first (for development/caching)
         const storedToken = localStorage.getItem('github_token');
         if (storedToken) {
-            return storedToken;
+            this.token = storedToken;
+            return this.token;
         }
-        
-        // If no token found, show error
-        console.error('GitHub token not found. Please set GITHUB_TOKEN environment variable in Netlify.');
-        return null;
+
+        try {
+            // Fetch token from Netlify function
+            const response = await fetch('/.netlify/functions/get-github-token');
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            
+            if (data.token) {
+                this.token = data.token;
+                // Cache the token in localStorage for future use
+                localStorage.setItem('github_token', this.token);
+                return this.token;
+            } else {
+                throw new Error('No token received from server');
+            }
+        } catch (error) {
+            console.error('Error fetching GitHub token:', error);
+            throw new Error('Failed to get GitHub token. Please check your Netlify configuration.');
+        }
     }
 
     // Method to set token (for development/testing)
@@ -37,28 +60,44 @@ class GitHubStorage {
         return this.token && this.token.length > 0;
     }
 
-    // Helper method to make GitHub API requests
+    // Generic method to make GitHub API requests
     async makeRequest(endpoint, options = {}) {
-        if (!this.hasToken()) {
-            throw new Error('GitHub token not set. Please configure your token first.');
+        // Ensure we have a token
+        if (!this.token) {
+            this.token = await this.getGitHubToken();
         }
 
         const url = `${this.baseUrl}${endpoint}`;
-        const response = await fetch(url, {
+        const defaultOptions = {
             headers: {
                 'Authorization': `token ${this.token}`,
                 'Accept': 'application/vnd.github.v3+json',
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        };
+
+        const requestOptions = {
+            ...defaultOptions,
+            ...options,
+            headers: {
+                ...defaultOptions.headers,
                 ...options.headers
-            },
-            ...options
-        });
+            }
+        };
 
-        if (!response.ok) {
-            throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
+        try {
+            const response = await fetch(url, requestOptions);
+            
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(`GitHub API error: ${response.status} - ${errorData.message || response.statusText}`);
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('GitHub API request failed:', error);
+            throw error;
         }
-
-        return response.json();
     }
 
     // Get file content from GitHub
@@ -167,19 +206,22 @@ class GameManagerWithGitHub {
     async init() {
         console.log('Initializing GameManagerWithGitHub...');
         
-        // Check if token is available
-        if (!this.storage.hasToken()) {
-            console.error('GitHub token not available. Please configure GITHUB_TOKEN environment variable in Netlify.');
-            this.showNotification('GitHub token not configured. Please contact administrator.', 'error');
-            return;
+        try {
+            // Check if token is available (this will fetch it if needed)
+            if (!this.storage.hasToken()) {
+                await this.storage.getGitHubToken();
+            }
+            
+            this.setupEventListeners();
+            await this.loadData();
+            this.renderGames();
+            this.updateEmptyState();
+            this.startAutoRefresh();
+            console.log('GameManagerWithGitHub initialized successfully');
+        } catch (error) {
+            console.error('Error during initialization:', error);
+            this.showNotification('Failed to initialize. Please check your Netlify configuration.', 'error');
         }
-        
-        this.setupEventListeners();
-        await this.loadData();
-        this.renderGames();
-        this.updateEmptyState();
-        this.startAutoRefresh();
-        console.log('GameManagerWithGitHub initialized successfully');
     }
 
     async loadData() {
