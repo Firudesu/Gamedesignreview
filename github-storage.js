@@ -3,7 +3,7 @@ class GitHubStorage {
     constructor() {
         this.token = null;
         this.owner = 'Firudesu';
-        this.repo = 'game-review-data';
+        this.repo = 'Gamedesignreview'; // Fixed repository name
         this.baseUrl = 'https://api.github.com';
     }
 
@@ -229,14 +229,21 @@ class GameManagerWithGitHub {
             this.isLoading = true;
             this.showLoadingState();
             
+            console.log('Loading data from GitHub...');
+            
             // Load games and members in parallel
             const [games, members] = await Promise.all([
                 this.storage.loadGames(),
                 this.storage.loadMembers()
             ]);
             
+            console.log('Loaded games:', games);
+            console.log('Loaded members:', members);
+            
             this.games = games;
             this.members = members;
+            
+            console.log('Data loaded successfully. Games count:', this.games.length);
             
             this.hideLoadingState();
         } catch (error) {
@@ -248,11 +255,17 @@ class GameManagerWithGitHub {
 
     async saveData() {
         try {
+            console.log('Saving data to GitHub...');
+            console.log('Games to save:', this.games);
+            console.log('Members to save:', this.members);
+            
             // Save games and members in parallel
             await Promise.all([
                 this.storage.saveGames(this.games),
                 this.storage.saveMembers(this.members)
             ]);
+            
+            console.log('Data saved successfully to GitHub');
         } catch (error) {
             console.error('Error saving data:', error);
             this.showNotification('Error saving data. Please try again.', 'error');
@@ -261,6 +274,8 @@ class GameManagerWithGitHub {
 
     async addGame(gameData) {
         try {
+            console.log('Creating new game with data:', gameData);
+            
             const game = {
                 id: Date.now().toString(),
                 name: gameData.name,
@@ -277,8 +292,14 @@ class GameManagerWithGitHub {
                 }
             };
 
+            console.log('Created game object:', game);
+            
             this.games.push(game);
+            console.log('Added game to local array. Total games:', this.games.length);
+            
             await this.saveData();
+            console.log('Game saved to GitHub successfully');
+            
             this.renderGames();
             this.updateEmptyState();
             this.showNotification('Game created successfully!', 'success');
