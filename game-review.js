@@ -1,661 +1,516 @@
-// Game Design Review System
-class GameDesignReview {
+// Game Task Management System
+class GameTaskManager {
     constructor() {
-        this.issues = [];
-        this.currentIssue = null;
+        this.games = [];
+        this.tasks = [];
         this.teamMembers = [];
-        this.settings = this.loadSettings();
-        this.annotationCanvas = null;
-        this.annotationContext = null;
-        this.isDrawing = false;
-        this.currentTool = 'draw';
-        this.currentColor = '#ff0000';
-        this.brushSize = 3;
-        this.originalImage = null;
+        this.currentGame = null;
+        this.currentView = 'games';
         
         this.init();
     }
 
     init() {
-        this.loadIssues();
-        this.loadTeamMembers();
+        this.loadData();
         this.setupEventListeners();
-        this.updateStatistics();
-        this.populateFilters();
+        this.renderGames();
     }
 
-    // Settings Management
-    loadSettings() {
-        const saved = localStorage.getItem('gameReviewSettings');
-        return saved ? JSON.parse(saved) : {
-            sheetsApiKey: '',
-            spreadsheetId: '',
-            teamMembers: []
-        };
+    // Data Management
+    loadData() {
+        this.games = JSON.parse(localStorage.getItem('gameTaskManager_games') || '[]');
+        this.tasks = JSON.parse(localStorage.getItem('gameTaskManager_tasks') || '[]');
+        this.teamMembers = JSON.parse(localStorage.getItem('gameTaskManager_members') || '[]');
     }
 
-    saveSettings() {
-        localStorage.setItem('gameReviewSettings', JSON.stringify(this.settings));
+    saveData() {
+        localStorage.setItem('gameTaskManager_games', JSON.stringify(this.games));
+        localStorage.setItem('gameTaskManager_tasks', JSON.stringify(this.tasks));
+        localStorage.setItem('gameTaskManager_members', JSON.stringify(this.teamMembers));
     }
 
-    // Issues Management
-    loadIssues() {
-        const saved = localStorage.getItem('gameReviewIssues');
-        this.issues = saved ? JSON.parse(saved) : [];
-        this.renderIssues();
-    }
-
-    saveIssues() {
-        localStorage.setItem('gameReviewIssues', JSON.stringify(this.issues));
-    }
-
-    addIssue(issueData) {
-        const issue = {
+    // Game Management
+    addGame(gameData) {
+        const game = {
             id: Date.now().toString(),
-            title: issueData.title,
-            description: issueData.description,
-            priority: issueData.priority,
-            assignee: issueData.assignee,
-            category: issueData.category,
-            status: 'open',
+            title: gameData.title,
+            description: gameData.description,
+            genre: gameData.genre,
             createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            media: issueData.media || [],
-            comments: [],
-            annotations: []
+            updatedAt: new Date().toISOString()
         };
 
-        this.issues.push(issue);
-        this.saveIssues();
-        this.renderIssues();
-        this.updateStatistics();
-        this.syncWithSheets();
+        this.games.push(game);
+        this.saveData();
+        this.renderGames();
+        this.closeModal('addGameModal');
+        this.showNotification('Game added successfully!', 'success');
     }
 
-    updateIssue(issueId, updates) {
-        const issue = this.issues.find(i => i.id === issueId);
-        if (issue) {
-            Object.assign(issue, updates, { updatedAt: new Date().toISOString() });
-            this.saveIssues();
-            this.renderIssues();
-            this.updateStatistics();
-            this.syncWithSheets();
+    deleteGame(gameId) {
+        if (confirm('Are you sure you want to delete this game and all its tasks?')) {
+            this.games = this.games.filter(g => g.id !== gameId);
+            this.tasks = this.tasks.filter(t => t.gameId !== gameId);
+            this.saveData();
+            this.renderGames();
+            this.showNotification('Game deleted successfully!', 'success');
         }
     }
 
-    deleteIssue(issueId) {
-        this.issues = this.issues.filter(i => i.id !== issueId);
-        this.saveIssues();
-        this.renderIssues();
-        this.updateStatistics();
-        this.syncWithSheets();
-    }
+    // Team Member Management
+    addTeamMember(memberData) {
+        const member = {
+            id: Date.now().toString(),
+            name: memberData.name,
+            email: memberData.email,
+            role: memberData.role,
+            createdAt: new Date().toISOString()
+        };
 
-    // Team Members Management
-    loadTeamMembers() {
-        const saved = localStorage.getItem('gameReviewTeamMembers');
-        this.teamMembers = saved ? JSON.parse(saved) : [];
-    }
-
-    saveTeamMembers() {
-        localStorage.setItem('gameReviewTeamMembers', JSON.stringify(this.teamMembers));
-    }
-
-    addTeamMember(name, email) {
-        const member = { id: Date.now().toString(), name, email };
         this.teamMembers.push(member);
-        this.saveTeamMembers();
-        this.populateFilters();
+        this.saveData();
+        this.updateAssigneeDropdowns();
+        this.closeModal('addMemberModal');
+        this.showNotification('Team member added successfully!', 'success');
     }
 
-    removeTeamMember(memberId) {
-        this.teamMembers = this.teamMembers.filter(m => m.id !== memberId);
-        this.saveTeamMembers();
-        this.populateFilters();
+    // Task Management
+    addTask(taskData) {
+        const task = {
+            id: Date.now().toString(),
+            gameId: this.currentGame.id,
+            title: taskData.title,
+            description: taskData.description,
+            category: taskData.category,
+            urgency: taskData.urgency || 'medium',
+            assignee: taskData.assignee,
+            status: 'open',
+            mediaLinks: this.parseMediaLinks(taskData.mediaLinks),
+            comments: [],
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+
+        // For review category, no urgency needed
+        if (task.category === 'review') {
+            task.urgency = null;
+        }
+
+        this.tasks.push(task);
+        this.saveData();
+        this.renderGameTasks();
+        this.closeModal('newTaskModal');
+        this.showNotification('Task created successfully!', 'success');
+    }
+
+    updateTask(taskId, updates) {
+        const task = this.tasks.find(t => t.id === taskId);
+        if (task) {
+            Object.assign(task, updates, { updatedAt: new Date().toISOString() });
+            this.saveData();
+            this.renderGameTasks();
+        }
+    }
+
+    deleteTask(taskId) {
+        if (confirm('Are you sure you want to delete this task?')) {
+            this.tasks = this.tasks.filter(t => t.id !== taskId);
+            this.saveData();
+            this.renderGameTasks();
+            this.closeModal('taskDetailModal');
+            this.showNotification('Task deleted successfully!', 'success');
+        }
+    }
+
+    markTaskComplete(taskId) {
+        this.updateTask(taskId, { status: 'completed' });
+        this.closeModal('taskDetailModal');
+        this.showNotification('Task marked as complete!', 'success');
+    }
+
+    addComment(taskId, commentText) {
+        const task = this.tasks.find(t => t.id === taskId);
+        if (task && commentText.trim()) {
+            const comment = {
+                id: Date.now().toString(),
+                text: commentText.trim(),
+                author: 'Current User',
+                createdAt: new Date().toISOString()
+            };
+            task.comments.push(comment);
+            this.saveData();
+            this.showTaskDetail(taskId);
+        }
+    }
+
+    // Media Links Parsing
+    parseMediaLinks(linksText) {
+        if (!linksText) return [];
+        return linksText.split('\n')
+            .map(link => link.trim())
+            .filter(link => link.length > 0)
+            .map(link => ({
+                id: Date.now().toString() + Math.random(),
+                url: link,
+                type: this.detectLinkType(link)
+            }));
+    }
+
+    detectLinkType(url) {
+        if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube';
+        if (url.includes('drive.google.com')) return 'google-drive';
+        if (url.includes('dropbox.com')) return 'dropbox';
+        if (url.match(/\.(jpg|jpeg|png|gif|webp)$/i)) return 'image';
+        if (url.match(/\.(mp4|avi|mov|wmv)$/i)) return 'video';
+        return 'link';
     }
 
     // UI Rendering
-    renderIssues() {
-        const issuesList = document.getElementById('issuesList');
-        const filteredIssues = this.getFilteredIssues();
-
-        issuesList.innerHTML = filteredIssues.length === 0 ? 
-            '<div class="text-center p-2">No issues found</div>' : 
-            filteredIssues.map(issue => this.renderIssueCard(issue)).join('');
-    }
-
-    renderIssueCard(issue) {
-        const statusClass = `issue-status ${issue.status}`;
-        const priorityClass = `issue-priority ${issue.priority}`;
-        const assignee = this.teamMembers.find(m => m.id === issue.assignee);
+    renderGames() {
+        const gamesList = document.getElementById('gamesList');
         
-        return `
-            <div class="issue-card" data-issue-id="${issue.id}">
-                <div class="issue-card-header">
-                    <div>
-                        <div class="issue-title">${this.escapeHtml(issue.title)}</div>
-                        <div class="issue-meta">
-                            <span class="${statusClass}">${issue.status}</span>
-                            <span class="${priorityClass}">${issue.priority}</span>
-                            <span class="issue-assignee">${assignee ? assignee.name : 'Unassigned'}</span>
-                            <span class="issue-category">${issue.category}</span>
-                        </div>
-                    </div>
-                    <div class="issue-actions">
-                        <button class="btn btn-secondary btn-sm" onclick="gameReview.editIssue('${issue.id}')">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn btn-secondary btn-sm" onclick="gameReview.deleteIssue('${issue.id}')">
+        if (this.games.length === 0) {
+            gamesList.innerHTML = \`
+                <div class="empty-state">
+                    <i class="fas fa-gamepad"></i>
+                    <h3>No games yet</h3>
+                    <p>Click "Add Game" to create your first game project</p>
+                </div>
+            \`;
+            return;
+        }
+
+        gamesList.innerHTML = this.games.map(game => \`
+            <div class="game-card" onclick="gameTaskManager.showGameDetail('\${game.id}')">
+                <div class="game-card-header">
+                    <h3>\${this.escapeHtml(game.title)}</h3>
+                    <div class="game-actions" onclick="event.stopPropagation()">
+                        <button class="btn btn-danger btn-sm" onclick="gameTaskManager.deleteGame('\${game.id}')" title="Delete Game">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
                 </div>
-                <div class="issue-description">${this.escapeHtml(issue.description)}</div>
-                ${issue.media.length > 0 ? `
-                    <div class="issue-media-preview">
-                        <i class="fas fa-image"></i> ${issue.media.length} attachment(s)
+                <div class="game-info">
+                    <p>\${this.escapeHtml(game.description || 'No description')}</p>
+                    <div class="game-meta">
+                        <span class="game-genre">\${game.genre ? this.escapeHtml(game.genre) : 'No genre'}</span>
+                        <span class="task-count">\${this.getGameTaskCount(game.id)} tasks</span>
                     </div>
-                ` : ''}
+                </div>
             </div>
-        `;
+        \`).join('');
     }
 
-    getFilteredIssues() {
-        const statusFilter = document.getElementById('statusFilter').value;
-        const priorityFilter = document.getElementById('priorityFilter').value;
-        const assigneeFilter = document.getElementById('assigneeFilter').value;
-        const searchTerm = document.getElementById('searchIssues').value.toLowerCase();
+    showGameDetail(gameId) {
+        this.currentGame = this.games.find(g => g.id === gameId);
+        if (!this.currentGame) return;
 
-        return this.issues.filter(issue => {
-            const statusMatch = statusFilter === 'all' || issue.status === statusFilter;
-            const priorityMatch = priorityFilter === 'all' || issue.priority === priorityFilter;
-            const assigneeMatch = assigneeFilter === 'all' || issue.assignee === assigneeFilter;
-            const searchMatch = !searchTerm || 
-                issue.title.toLowerCase().includes(searchTerm) ||
-                issue.description.toLowerCase().includes(searchTerm);
-
-            return statusMatch && priorityMatch && assigneeMatch && searchMatch;
-        });
-    }
-
-    updateStatistics() {
-        document.getElementById('totalIssues').textContent = this.issues.length;
-        document.getElementById('openIssues').textContent = this.issues.filter(i => i.status === 'open').length;
-        document.getElementById('completedIssues').textContent = this.issues.filter(i => i.status === 'completed').length;
-    }
-
-    populateFilters() {
-        const assigneeFilter = document.getElementById('assigneeFilter');
-        const issueAssignee = document.getElementById('issueAssignee');
+        document.getElementById('gamesView').style.display = 'none';
+        document.getElementById('gameDetailView').style.display = 'block';
+        document.getElementById('currentGameTitle').textContent = this.currentGame.title;
         
-        const options = ['<option value="all">All Assignees</option>'];
-        this.teamMembers.forEach(member => {
-            options.push(`<option value="${member.id}">${this.escapeHtml(member.name)}</option>`);
-        });
-
-        assigneeFilter.innerHTML = options.join('');
-        issueAssignee.innerHTML = '<option value="">Unassigned</option>' + options.slice(1).join('');
+        this.currentView = 'gameDetail';
+        this.renderGameTasks();
     }
 
-    // Modal Management
-    showModal(modalId) {
-        const modal = document.getElementById(modalId);
-        modal.classList.add('show');
-        document.body.style.overflow = 'hidden';
+    showGamesList() {
+        document.getElementById('gamesView').style.display = 'block';
+        document.getElementById('gameDetailView').style.display = 'none';
+        this.currentView = 'games';
+        this.currentGame = null;
     }
 
-    hideModal(modalId) {
-        const modal = document.getElementById(modalId);
-        modal.classList.remove('show');
-        document.body.style.overflow = 'auto';
-    }
+    renderGameTasks() {
+        if (!this.currentGame) return;
 
-    // File Upload and Media Management
-    setupFileUpload() {
-        const fileUploadArea = document.getElementById('fileUploadArea');
-        const fileInput = document.getElementById('fileInput');
+        const gameTasks = this.tasks.filter(t => t.gameId === this.currentGame.id);
+        const categories = ['bug', 'controls', 'quest', 'ui', 'performance', 'review'];
 
-        fileUploadArea.addEventListener('click', () => fileInput.click());
-        fileUploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            fileUploadArea.style.borderColor = '#3b82f6';
-            fileUploadArea.style.background = '#f8fafc';
-        });
-        fileUploadArea.addEventListener('dragleave', (e) => {
-            e.preventDefault();
-            fileUploadArea.style.borderColor = '#cbd5e1';
-            fileUploadArea.style.background = '#ffffff';
-        });
-        fileUploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            fileUploadArea.style.borderColor = '#cbd5e1';
-            fileUploadArea.style.background = '#ffffff';
-            this.handleFileDrop(e.dataTransfer.files);
-        });
-
-        fileInput.addEventListener('change', (e) => {
-            this.handleFileSelect(e.target.files);
+        categories.forEach(category => {
+            const categoryTasks = gameTasks.filter(t => t.category === category);
+            const sortedTasks = this.sortTasksByUrgency(categoryTasks);
+            
+            // Update count
+            document.getElementById(\`\${category}Count\`).textContent = categoryTasks.length;
+            
+            // Render tasks
+            const container = document.getElementById(\`\${category}Tasks\`);
+            container.innerHTML = sortedTasks.length === 0 ? 
+                '<div class="empty-category">No tasks in this category</div>' :
+                sortedTasks.map(task => this.renderTaskCard(task)).join('');
         });
     }
 
-    handleFileDrop(files) {
-        this.processFiles(Array.from(files));
-    }
-
-    handleFileSelect(files) {
-        this.processFiles(Array.from(files));
-    }
-
-    processFiles(files) {
-        const filePreview = document.getElementById('filePreview');
-        const currentFiles = [];
-
-        files.forEach(file => {
-            if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const mediaItem = {
-                        id: Date.now().toString() + Math.random(),
-                        name: file.name,
-                        type: file.type,
-                        data: e.target.result,
-                        size: file.size
-                    };
-                    currentFiles.push(mediaItem);
-                    this.renderFilePreview(mediaItem);
-                };
-                reader.readAsDataURL(file);
+    sortTasksByUrgency(tasks) {
+        const urgencyOrder = { critical: 0, high: 1, medium: 2, low: 3 };
+        return tasks.sort((a, b) => {
+            // Review tasks don't have urgency, so they go to the end
+            if (a.category === 'review' && b.category !== 'review') return 1;
+            if (b.category === 'review' && a.category !== 'review') return -1;
+            if (a.category === 'review' && b.category === 'review') {
+                return new Date(b.createdAt) - new Date(a.createdAt); // Most recent first
             }
+            
+            const aUrgency = urgencyOrder[a.urgency] !== undefined ? urgencyOrder[a.urgency] : 4;
+            const bUrgency = urgencyOrder[b.urgency] !== undefined ? urgencyOrder[b.urgency] : 4;
+            return aUrgency - bUrgency;
         });
     }
 
-    renderFilePreview(mediaItem) {
-        const filePreview = document.getElementById('filePreview');
-        const previewItem = document.createElement('div');
-        previewItem.className = 'file-preview-item';
-        previewItem.dataset.fileId = mediaItem.id;
-
-        if (mediaItem.type.startsWith('image/')) {
-            previewItem.innerHTML = `
-                <img src="${mediaItem.data}" alt="${mediaItem.name}">
-                <button class="remove-file" onclick="gameReview.removeFile('${mediaItem.id}')">&times;</button>
-            `;
-        } else {
-            previewItem.innerHTML = `
-                <video src="${mediaItem.data}" muted></video>
-                <button class="remove-file" onclick="gameReview.removeFile('${mediaItem.id}')">&times;</button>
-            `;
-        }
-
-        filePreview.appendChild(previewItem);
-    }
-
-    removeFile(fileId) {
-        const previewItem = document.querySelector(`[data-file-id="${fileId}"]`);
-        if (previewItem) {
-            previewItem.remove();
-        }
-    }
-
-    // Image Annotation System
-    setupAnnotationCanvas() {
-        this.annotationCanvas = document.getElementById('annotationCanvas');
-        this.annotationContext = this.annotationCanvas.getContext('2d');
+    renderTaskCard(task) {
+        const statusClass = \`task-status \${task.status}\`;
+        const urgencyClass = task.urgency ? \`task-urgency \${task.urgency}\` : '';
+        const assignee = this.teamMembers.find(m => m.id === task.assignee);
         
-        this.annotationCanvas.addEventListener('mousedown', (e) => this.startDrawing(e));
-        this.annotationCanvas.addEventListener('mousemove', (e) => this.draw(e));
-        this.annotationCanvas.addEventListener('mouseup', () => this.stopDrawing());
-        this.annotationCanvas.addEventListener('mouseleave', () => this.stopDrawing());
+        return \`
+            <div class="task-card \${task.status}" onclick="gameTaskManager.showTaskDetail('\${task.id}')">
+                <div class="task-card-header">
+                    <h4>\${this.escapeHtml(task.title)}</h4>
+                    <div class="task-meta">
+                        <span class="\${statusClass}">\${task.status}</span>
+                        \${task.urgency ? \`<span class="\${urgencyClass}">\${task.urgency}</span>\` : ''}
+                        \${assignee ? \`<span class="task-assignee">\${this.escapeHtml(assignee.name)}</span>\` : ''}
+                    </div>
+                </div>
+                \${task.description ? \`<p class="task-description">\${this.escapeHtml(task.description)}</p>\` : ''}
+                <div class="task-card-footer">
+                    <span class="task-date">\${this.formatDate(task.createdAt)}</span>
+                    \${task.mediaLinks.length > 0 ? \`<span class="has-media"><i class="fas fa-link"></i> \${task.mediaLinks.length}</span>\` : ''}
+                    \${task.comments.length > 0 ? \`<span class="has-comments"><i class="fas fa-comment"></i> \${task.comments.length}</span>\` : ''}
+                </div>
+            </div>
+        \`;
     }
 
-    loadImageForAnnotation(imageData) {
-        this.originalImage = new Image();
-        this.originalImage.onload = () => {
-            this.annotationCanvas.width = this.originalImage.width;
-            this.annotationCanvas.height = this.originalImage.height;
-            this.annotationContext.drawImage(this.originalImage, 0, 0);
-        };
-        this.originalImage.src = imageData;
-    }
+    showTaskDetail(taskId) {
+        const task = this.tasks.find(t => t.id === taskId);
+        if (!task) return;
 
-    startDrawing(e) {
-        this.isDrawing = true;
-        const rect = this.annotationCanvas.getBoundingClientRect();
-        this.annotationContext.beginPath();
-        this.annotationContext.moveTo(e.clientX - rect.left, e.clientY - rect.top);
-    }
-
-    draw(e) {
-        if (!this.isDrawing) return;
+        const modal = document.getElementById('taskDetailModal');
+        document.getElementById('detailTaskTitle').textContent = task.title;
+        document.getElementById('detailTaskStatus').textContent = task.status;
+        document.getElementById('detailTaskStatus').className = \`task-status \${task.status}\`;
+        document.getElementById('detailTaskCategory').textContent = task.category;
+        document.getElementById('detailTaskUrgency').textContent = task.urgency || 'N/A';
+        document.getElementById('detailTaskUrgency').style.display = task.urgency ? 'inline' : 'none';
         
-        const rect = this.annotationCanvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+        const assignee = this.teamMembers.find(m => m.id === task.assignee);
+        document.getElementById('detailTaskAssignee').textContent = assignee ? assignee.name : 'Unassigned';
+        document.getElementById('detailTaskDescription').textContent = task.description || 'No description';
 
-        this.annotationContext.strokeStyle = this.currentColor;
-        this.annotationContext.lineWidth = this.brushSize;
-        this.annotationContext.lineCap = 'round';
-        this.annotationContext.lineTo(x, y);
-        this.annotationContext.stroke();
+        this.renderMediaLinks(task.mediaLinks);
+        this.renderComments(task.comments);
+
+        modal.dataset.taskId = taskId;
+        this.showModal('taskDetailModal');
     }
 
-    stopDrawing() {
-        this.isDrawing = false;
-    }
-
-    clearCanvas() {
-        if (this.originalImage) {
-            this.annotationContext.clearRect(0, 0, this.annotationCanvas.width, this.annotationCanvas.height);
-            this.annotationContext.drawImage(this.originalImage, 0, 0);
-        }
-    }
-
-    saveAnnotation() {
-        const annotatedImageData = this.annotationCanvas.toDataURL('image/png');
-        return annotatedImageData;
-    }
-
-    // Google Sheets Integration
-    async syncWithSheets() {
-        if (!this.settings.sheetsApiKey || !this.settings.spreadsheetId) {
-            console.log('Google Sheets not configured');
+    renderMediaLinks(mediaLinks) {
+        const container = document.getElementById('mediaLinksContainer');
+        
+        if (mediaLinks.length === 0) {
+            container.innerHTML = '<p class="text-muted">No media links</p>';
             return;
         }
 
-        try {
-            await this.initializeGoogleSheetsAPI();
-            await this.updateSpreadsheet();
-        } catch (error) {
-            console.error('Error syncing with Google Sheets:', error);
-            this.showNotification('Error syncing with Google Sheets', 'error');
-        }
+        container.innerHTML = mediaLinks.map(link => {
+            const icon = this.getMediaIcon(link.type);
+            return \`
+                <div class="media-link-item">
+                    <i class="fas fa-\${icon}"></i>
+                    <a href="\${link.url}" target="_blank" rel="noopener noreferrer">\${link.url}</a>
+                </div>
+            \`;
+        }).join('');
     }
 
-    async initializeGoogleSheetsAPI() {
-        return new Promise((resolve, reject) => {
-            gapi.load('client', async () => {
-                try {
-                    await gapi.client.init({
-                        apiKey: this.settings.sheetsApiKey,
-                        discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4']
-                    });
-                    resolve();
-                } catch (error) {
-                    reject(error);
-                }
-            });
-        });
+    getMediaIcon(type) {
+        const icons = {
+            youtube: 'play',
+            'google-drive': 'cloud',
+            dropbox: 'cloud',
+            image: 'image',
+            video: 'video',
+            link: 'external-link-alt'
+        };
+        return icons[type] || 'link';
     }
 
-    async updateSpreadsheet() {
-        const headers = ['ID', 'Title', 'Description', 'Priority', 'Assignee', 'Category', 'Status', 'Created', 'Updated'];
-        const values = this.issues.map(issue => [
-            issue.id,
-            issue.title,
-            issue.description,
-            issue.priority,
-            this.teamMembers.find(m => m.id === issue.assignee)?.name || 'Unassigned',
-            issue.category,
-            issue.status,
-            new Date(issue.createdAt).toLocaleDateString(),
-            new Date(issue.updatedAt).toLocaleDateString()
-        ]);
-
-        const range = 'A1:I' + (values.length + 1);
+    renderComments(comments) {
+        const container = document.getElementById('commentsList');
         
-        await gapi.client.sheets.spreadsheets.values.update({
-            spreadsheetId: this.settings.spreadsheetId,
-            range: range,
-            valueInputOption: 'RAW',
-            resource: {
-                values: [headers, ...values]
-            }
-        });
+        if (comments.length === 0) {
+            container.innerHTML = '<p class="text-muted">No comments yet</p>';
+            return;
+        }
+
+        container.innerHTML = comments.map(comment => \`
+            <div class="comment-item">
+                <div class="comment-header">
+                    <strong>\${this.escapeHtml(comment.author)}</strong>
+                    <span class="comment-date">\${this.formatDate(comment.createdAt)}</span>
+                </div>
+                <div class="comment-text">\${this.escapeHtml(comment.text)}</div>
+            </div>
+        \`).join('');
     }
 
     // Event Listeners
     setupEventListeners() {
-        // Modal controls
-        document.querySelectorAll('.modal-close').forEach(btn => {
+        // Header buttons
+        document.getElementById('addGameBtn').addEventListener('click', () => this.showModal('addGameModal'));
+        document.getElementById('addMemberBtn').addEventListener('click', () => this.showModal('addMemberModal'));
+
+        // Back button
+        document.getElementById('backToGames').addEventListener('click', () => this.showGamesList());
+
+        // New task button
+        document.getElementById('newTaskBtn').addEventListener('click', () => {
+            this.updateAssigneeDropdowns();
+            this.showModal('newTaskModal');
+        });
+
+        // Form submissions
+        document.getElementById('addGameForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleAddGame();
+        });
+
+        document.getElementById('addMemberForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleAddMember();
+        });
+
+        document.getElementById('newTaskForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleNewTask();
+        });
+
+        // Modal close buttons
+        document.querySelectorAll('.modal-close, #cancelGame, #cancelMember, #cancelTask, #closeTaskDetail').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const modal = e.target.closest('.modal');
-                this.hideModal(modal.id);
+                if (modal) this.closeModal(modal.id);
             });
         });
 
-        // New issue button
-        document.getElementById('newIssueBtn').addEventListener('click', () => {
-            this.showModal('newIssueModal');
+        // Task detail actions
+        document.getElementById('deleteTask').addEventListener('click', () => {
+            const taskId = document.getElementById('taskDetailModal').dataset.taskId;
+            this.deleteTask(taskId);
         });
 
-        // New issue form
-        document.getElementById('newIssueForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.createNewIssue();
+        document.getElementById('markTaskComplete').addEventListener('click', () => {
+            const taskId = document.getElementById('taskDetailModal').dataset.taskId;
+            this.markTaskComplete(taskId);
         });
 
-        // Cancel buttons
-        document.getElementById('cancelIssue').addEventListener('click', () => {
-            this.hideModal('newIssueModal');
+        // Add comment
+        document.getElementById('addCommentBtn').addEventListener('click', () => {
+            const taskId = document.getElementById('taskDetailModal').dataset.taskId;
+            const commentText = document.getElementById('newComment').value;
+            this.addComment(taskId, commentText);
+            document.getElementById('newComment').value = '';
         });
 
-        // Settings
-        document.getElementById('settingsBtn').addEventListener('click', () => {
-            this.showModal('settingsModal');
-            this.loadSettingsForm();
+        // Category selection in task form
+        document.getElementById('taskCategory').addEventListener('change', (e) => {
+            const urgencyGroup = document.getElementById('urgencyGroup');
+            urgencyGroup.style.display = e.target.value === 'review' ? 'none' : 'block';
         });
-
-        document.getElementById('saveSettings').addEventListener('click', () => {
-            this.saveSettingsForm();
-        });
-
-        // Sync button
-        document.getElementById('syncBtn').addEventListener('click', () => {
-            this.syncWithSheets();
-        });
-
-        // Filters
-        document.getElementById('statusFilter').addEventListener('change', () => this.renderIssues());
-        document.getElementById('priorityFilter').addEventListener('change', () => this.renderIssues());
-        document.getElementById('assigneeFilter').addEventListener('change', () => this.renderIssues());
-        document.getElementById('searchIssues').addEventListener('input', () => this.renderIssues());
-
-        // File upload
-        this.setupFileUpload();
-
-        // Annotation tools
-        this.setupAnnotationTools();
 
         // Close modals when clicking outside
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    this.hideModal(modal.id);
-                }
-            });
-        });
-    }
-
-    setupAnnotationTools() {
-        document.getElementById('drawTool').addEventListener('click', () => this.setTool('draw'));
-        document.getElementById('arrowTool').addEventListener('click', () => this.setTool('arrow'));
-        document.getElementById('textTool').addEventListener('click', () => this.setTool('text'));
-        document.getElementById('circleTool').addEventListener('click', () => this.setTool('circle'));
-        document.getElementById('rectTool').addEventListener('click', () => this.setTool('rect'));
-        document.getElementById('clearCanvas').addEventListener('click', () => this.clearCanvas());
-        
-        document.getElementById('colorPicker').addEventListener('change', (e) => {
-            this.currentColor = e.target.value;
-        });
-        
-        document.getElementById('brushSize').addEventListener('input', (e) => {
-            this.brushSize = parseInt(e.target.value);
-        });
-    }
-
-    setTool(tool) {
-        this.currentTool = tool;
-        document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
-        document.getElementById(tool + 'Tool').classList.add('active');
-    }
-
-    // Form handling
-    createNewIssue() {
-        const formData = {
-            title: document.getElementById('issueTitle').value,
-            description: document.getElementById('issueDescription').value,
-            priority: document.getElementById('issuePriority').value,
-            assignee: document.getElementById('issueAssignee').value,
-            category: document.getElementById('issueCategory').value,
-            media: this.getCurrentFiles()
-        };
-
-        this.addIssue(formData);
-        this.hideModal('newIssueModal');
-        this.resetNewIssueForm();
-        this.showNotification('Issue created successfully', 'success');
-    }
-
-    getCurrentFiles() {
-        const files = [];
-        document.querySelectorAll('#filePreview .file-preview-item').forEach(item => {
-            const img = item.querySelector('img');
-            const video = item.querySelector('video');
-            if (img) {
-                files.push({
-                    type: 'image',
-                    data: img.src,
-                    name: 'Screenshot'
-                });
-            } else if (video) {
-                files.push({
-                    type: 'video',
-                    data: video.src,
-                    name: 'Video'
-                });
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                this.closeModal(e.target.id);
             }
         });
-        return files;
     }
 
-    resetNewIssueForm() {
-        document.getElementById('newIssueForm').reset();
-        document.getElementById('filePreview').innerHTML = '';
+    // Form Handlers
+    handleAddGame() {
+        this.addGame({
+            title: document.getElementById('gameTitle').value,
+            description: document.getElementById('gameDescription').value,
+            genre: document.getElementById('gameGenre').value
+        });
+        
+        document.getElementById('addGameForm').reset();
     }
 
-    loadSettingsForm() {
-        document.getElementById('sheetsApiKey').value = this.settings.sheetsApiKey;
-        document.getElementById('spreadsheetId').value = this.settings.spreadsheetId;
-        this.renderTeamMembersList();
+    handleAddMember() {
+        this.addTeamMember({
+            name: document.getElementById('memberName').value,
+            email: document.getElementById('memberEmail').value,
+            role: document.getElementById('memberRole').value
+        });
+        
+        document.getElementById('addMemberForm').reset();
     }
 
-    saveSettingsForm() {
-        this.settings.sheetsApiKey = document.getElementById('sheetsApiKey').value;
-        this.settings.spreadsheetId = document.getElementById('spreadsheetId').value;
-        this.saveSettings();
-        this.hideModal('settingsModal');
-        this.showNotification('Settings saved successfully', 'success');
+    handleNewTask() {
+        this.addTask({
+            title: document.getElementById('taskTitle').value,
+            category: document.getElementById('taskCategory').value,
+            urgency: document.getElementById('taskUrgency').value,
+            assignee: document.getElementById('taskAssignee').value,
+            description: document.getElementById('taskDescription').value,
+            mediaLinks: document.getElementById('taskMediaLinks').value
+        });
+        
+        document.getElementById('newTaskForm').reset();
     }
 
-    renderTeamMembersList() {
-        const list = document.getElementById('teamMembersList');
-        list.innerHTML = this.teamMembers.map(member => `
-            <div class="team-member">
-                <div class="team-member-info">
-                    <div class="team-member-name">${this.escapeHtml(member.name)}</div>
-                    <div class="team-member-email">${this.escapeHtml(member.email)}</div>
-                </div>
-                <button class="remove-member" onclick="gameReview.removeTeamMember('${member.id}')">Remove</button>
-            </div>
-        `).join('');
+    // Utility Methods
+    updateAssigneeDropdowns() {
+        const dropdown = document.getElementById('taskAssignee');
+        dropdown.innerHTML = '<option value="">Unassigned</option>' +
+            this.teamMembers.map(member => 
+                \`<option value="\${member.id}">\${this.escapeHtml(member.name)}</option>\`
+            ).join('');
     }
 
-    // Utility functions
+    getGameTaskCount(gameId) {
+        return this.tasks.filter(t => t.gameId === gameId).length;
+    }
+
+    showModal(modalId) {
+        document.getElementById(modalId).style.display = 'flex';
+    }
+
+    closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+
+    showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = \`notification notification-\${type}\`;
+        notification.innerHTML = \`
+            <i class="fas fa-\${type === 'success' ? 'check' : type === 'error' ? 'times' : 'info'}"></i>
+            \${message}
+        \`;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
+
+    formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    }
+
     escapeHtml(text) {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
     }
-
-    showNotification(message, type = 'info') {
-        // Simple notification system
-        const notification = document.createElement('div');
-        notification.className = `notification notification-${type}`;
-        notification.textContent = message;
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            color: white;
-            z-index: 10000;
-            background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
-        `;
-        
-        document.body.appendChild(notification);
-        setTimeout(() => notification.remove(), 3000);
-    }
-
-    editIssue(issueId) {
-        const issue = this.issues.find(i => i.id === issueId);
-        if (issue) {
-            this.currentIssue = issue;
-            this.showIssueDetail(issue);
-        }
-    }
-
-    showIssueDetail(issue) {
-        document.getElementById('detailIssueTitle').textContent = issue.title;
-        document.getElementById('detailIssueStatus').textContent = issue.status;
-        document.getElementById('detailIssuePriority').textContent = issue.priority;
-        document.getElementById('detailIssueAssignee').textContent = 
-            this.teamMembers.find(m => m.id === issue.assignee)?.name || 'Unassigned';
-        document.getElementById('detailIssueDescription').textContent = issue.description;
-        
-        this.renderIssueMedia(issue);
-        this.renderIssueComments(issue);
-        
-        this.showModal('issueDetailModal');
-    }
-
-    renderIssueMedia(issue) {
-        const container = document.getElementById('mediaContainer');
-        container.innerHTML = issue.media.map(media => `
-            <div class="media-item" onclick="gameReview.openAnnotation('${media.data}')">
-                ${media.type === 'image' ? 
-                    `<img src="${media.data}" alt="Screenshot">` :
-                    `<video src="${media.data}" muted></video>`
-                }
-                <div class="media-item-overlay">
-                    <i class="fas fa-edit"></i>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    renderIssueComments(issue) {
-        const container = document.getElementById('commentsList');
-        container.innerHTML = issue.comments.map(comment => `
-            <div class="comment">
-                <div class="comment-header">
-                    <span class="comment-author">${this.escapeHtml(comment.author)}</span>
-                    <span class="comment-date">${new Date(comment.date).toLocaleDateString()}</span>
-                </div>
-                <div class="comment-text">${this.escapeHtml(comment.text)}</div>
-            </div>
-        `).join('');
-    }
-
-    openAnnotation(imageData) {
-        this.loadImageForAnnotation(imageData);
-        this.setupAnnotationCanvas();
-        this.showModal('annotationModal');
-    }
 }
 
 // Initialize the application
-let gameReview;
+let gameTaskManager;
 document.addEventListener('DOMContentLoaded', () => {
-    gameReview = new GameDesignReview();
+    gameTaskManager = new GameTaskManager();
 });
