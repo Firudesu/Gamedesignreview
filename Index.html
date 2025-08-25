@@ -17,57 +17,51 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
         }
 
-        .container {
-            background: #ffffff;
-            border-radius: 1rem;
-            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            width: 100%;
-            overflow: hidden;
-            text-align: center;
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
         }
 
         .header {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-            color: #ffffff;
+            background: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
             padding: 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .header h1 {
+            color: #1e293b;
             font-size: 2rem;
             font-weight: 700;
-            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
         }
 
-        .header p {
-            opacity: 0.9;
-            font-size: 1.1rem;
-        }
-
-        .content {
-            padding: 2rem;
+        .header-actions {
+            display: flex;
+            gap: 1rem;
         }
 
         .btn {
-            display: inline-block;
-            padding: 1rem 2rem;
-            margin: 0.5rem;
+            padding: 0.75rem 1.5rem;
             border: none;
             border-radius: 0.5rem;
             font-size: 1rem;
             font-weight: 500;
-            text-decoration: none;
             cursor: pointer;
             transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
+            text-decoration: none;
         }
 
         .btn-primary {
@@ -89,92 +83,509 @@
             background: #e2e8f0;
         }
 
-        .features {
-            margin: 2rem 0;
-            text-align: left;
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
         }
 
-        .features h3 {
+        .game-card {
+            background: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .game-card h3 {
             color: #1e293b;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .game-stats {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .stat {
+            text-align: center;
+            flex: 1;
+        }
+
+        .stat-number {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #3b82f6;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        .game-categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .category-tag {
+            background: #e0e7ff;
+            color: #3730a3;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .empty-state {
+            text-align: center;
+            background: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 3rem;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #cbd5e1;
             margin-bottom: 1rem;
         }
 
-        .feature-list {
-            list-style: none;
+        .empty-state h3 {
+            color: #64748b;
+            margin-bottom: 1rem;
         }
 
-        .feature-list li {
-            padding: 0.5rem 0;
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #ffffff;
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 {
+            color: #1e293b;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #64748b;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .members-list {
+            margin-top: 1rem;
+        }
+
+        .member-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background: #f8fafc;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .member-info {
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            color: #374151;
         }
 
-        .feature-list li i {
-            color: #10b981;
-            font-size: 1.1rem;
+        .member-avatar {
+            width: 2rem;
+            height: 2rem;
+            background: #3b82f6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-weight: 600;
         }
 
-        .footer {
-            padding: 1rem;
-            border-top: 1px solid #e2e8f0;
-            color: #64748b;
-            font-size: 0.875rem;
+        .remove-member {
+            background: #ef4444;
+            color: #ffffff;
+            border: none;
+            border-radius: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            cursor: pointer;
+            font-size: 0.75rem;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
             <h1><i class="fas fa-gamepad"></i> Game Design Review System</h1>
-            <p>Streamline your game design review process</p>
+            <div class="header-actions">
+                <button id="addGameBtn" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add Game
+                </button>
+                <button id="addMemberBtn" class="btn btn-secondary">
+                    <i class="fas fa-user-plus"></i> Add Member
+                </button>
+            </div>
+        </header>
+
+        <!-- Games Grid -->
+        <div id="gamesContainer">
+            <!-- Games will be populated here -->
         </div>
 
-        <div class="content">
-            <div class="features">
-                <h3>What you can do:</h3>
-                <ul class="feature-list">
-                    <li><i class="fas fa-check"></i> Create and manage design review issues</li>
-                    <li><i class="fas fa-check"></i> Upload screenshots and videos</li>
-                    <li><i class="fas fa-check"></i> Draw annotations on images</li>
-                    <li><i class="fas fa-check"></i> Sync with Google Sheets</li>
-                    <li><i class="fas fa-check"></i> Assign tasks to team members</li>
-                    <li><i class="fas fa-check"></i> Track progress and completion</li>
-                </ul>
-            </div>
-
-            <div class="actions">
-                <a href="setup.html" class="btn btn-primary">
-                    <i class="fas fa-rocket"></i> Get Started
-                </a>
-                <a href="game-design-review.html" class="btn btn-secondary">
-                    <i class="fas fa-play"></i> Launch App
-                </a>
-                <a href="demo.html" class="btn btn-secondary">
-                    <i class="fas fa-eye"></i> View Demo
-                </a>
-            </div>
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <i class="fas fa-gamepad"></i>
+            <h3>No games yet</h3>
+            <p>Create your first game to get started with design reviews</p>
+            <button id="createFirstGameBtn" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Create First Game
+            </button>
         </div>
+    </div>
 
-        <div class="footer">
-            <p>Choose an option above to get started with your game design reviews</p>
+    <!-- Add Game Modal -->
+    <div id="addGameModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Game</h2>
+                <button class="close-btn" onclick="closeModal('addGameModal')">&times;</button>
+            </div>
+            <form id="addGameForm">
+                <div class="form-group">
+                    <label for="gameName">Game Name</label>
+                    <input type="text" id="gameName" required>
+                </div>
+                <div class="form-group">
+                    <label for="gameDescription">Description</label>
+                    <textarea id="gameDescription" placeholder="Brief description of the game..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="gameGenre">Genre</label>
+                    <input type="text" id="gameGenre" placeholder="e.g., Action, RPG, Strategy">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addGameModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Game</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Member Modal -->
+    <div id="addMemberModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add Team Member</h2>
+                <button class="close-btn" onclick="closeModal('addMemberModal')">&times;</button>
+            </div>
+            <form id="addMemberForm">
+                <div class="form-group">
+                    <label for="memberName">Name</label>
+                    <input type="text" id="memberName" required>
+                </div>
+                <div class="form-group">
+                    <label for="memberRole">Role</label>
+                    <input type="text" id="memberRole" placeholder="e.g., Designer, Developer, Artist">
+                </div>
+                <div class="form-group">
+                    <label for="memberEmail">Email</label>
+                    <input type="email" id="memberEmail" placeholder="optional">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addMemberModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Member</button>
+                </div>
+            </form>
         </div>
     </div>
 
     <script>
-        // Check if user has already set up the system
-        window.addEventListener('load', () => {
-            const hasSettings = localStorage.getItem('gameReviewSettings');
-            const hasTeamMembers = localStorage.getItem('gameReviewTeamMembers');
-            
-            if (hasSettings && hasTeamMembers) {
-                // User has already set up, suggest going directly to app
-                const setupBtn = document.querySelector('a[href="setup.html"]');
-                if (setupBtn) {
-                    setupBtn.innerHTML = '<i class="fas fa-cog"></i> Settings';
-                    setupBtn.href = 'game-design-review.html#settings';
+        class GameManager {
+            constructor() {
+                this.games = this.loadGames();
+                this.members = this.loadMembers();
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.renderGames();
+                this.updateEmptyState();
+            }
+
+            loadGames() {
+                const saved = localStorage.getItem('gameReviewGames');
+                return saved ? JSON.parse(saved) : [];
+            }
+
+            saveGames() {
+                localStorage.setItem('gameReviewGames', JSON.stringify(this.games));
+            }
+
+            loadMembers() {
+                const saved = localStorage.getItem('gameReviewMembers');
+                return saved ? JSON.parse(saved) : [];
+            }
+
+            saveMembers() {
+                localStorage.setItem('gameReviewMembers', JSON.stringify(this.members));
+            }
+
+            addGame(gameData) {
+                const game = {
+                    id: Date.now().toString(),
+                    name: gameData.name,
+                    description: gameData.description,
+                    genre: gameData.genre,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    issues: {
+                        bug: [],
+                        controls: [],
+                        quest: [],
+                        review: []
+                    }
+                };
+
+                this.games.push(game);
+                this.saveGames();
+                this.renderGames();
+                this.updateEmptyState();
+            }
+
+            addMember(memberData) {
+                const member = {
+                    id: Date.now().toString(),
+                    name: memberData.name,
+                    role: memberData.role,
+                    email: memberData.email,
+                    createdAt: new Date().toISOString()
+                };
+
+                this.members.push(member);
+                this.saveMembers();
+            }
+
+            getGameStats(gameId) {
+                const game = this.games.find(g => g.id === gameId);
+                if (!game) return { total: 0, open: 0, completed: 0 };
+
+                const allIssues = [
+                    ...game.issues.bug,
+                    ...game.issues.controls,
+                    ...game.issues.quest,
+                    ...game.issues.review
+                ];
+
+                return {
+                    total: allIssues.length,
+                    open: allIssues.filter(issue => issue.status !== 'completed').length,
+                    completed: allIssues.filter(issue => issue.status === 'completed').length
+                };
+            }
+
+            renderGames() {
+                const container = document.getElementById('gamesContainer');
+                
+                if (this.games.length === 0) {
+                    container.innerHTML = '';
+                    return;
                 }
+
+                container.innerHTML = `
+                    <div class="games-grid">
+                        ${this.games.map(game => {
+                            const stats = this.getGameStats(game.id);
+                            return `
+                                <div class="game-card" onclick="gameManager.openGame('${game.id}')">
+                                    <h3>${game.name}</h3>
+                                    <p style="color: #64748b; margin-bottom: 1rem;">${game.description || 'No description'}</p>
+                                    
+                                    <div class="game-stats">
+                                        <div class="stat">
+                                            <span class="stat-number">${stats.total}</span>
+                                            <span class="stat-label">Total</span>
+                                        </div>
+                                        <div class="stat">
+                                            <span class="stat-number">${stats.open}</span>
+                                            <span class="stat-label">Open</span>
+                                        </div>
+                                        <div class="stat">
+                                            <span class="stat-number">${stats.completed}</span>
+                                            <span class="stat-label">Done</span>
+                                        </div>
+                                    </div>
+
+                                    ${game.genre ? `
+                                        <div class="game-categories">
+                                            <span class="category-tag">${game.genre}</span>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+            }
+
+            updateEmptyState() {
+                const emptyState = document.getElementById('emptyState');
+                const gamesContainer = document.getElementById('gamesContainer');
+                
+                if (this.games.length === 0) {
+                    emptyState.style.display = 'block';
+                    gamesContainer.style.display = 'none';
+                } else {
+                    emptyState.style.display = 'none';
+                    gamesContainer.style.display = 'block';
+                }
+            }
+
+            openGame(gameId) {
+                // Store the current game ID and redirect to the game review page
+                localStorage.setItem('currentGameId', gameId);
+                window.location.href = 'game-design-review.html';
+            }
+
+            setupEventListeners() {
+                // Add Game button
+                document.getElementById('addGameBtn').addEventListener('click', () => {
+                    document.getElementById('addGameModal').classList.add('active');
+                });
+
+                // Create First Game button
+                document.getElementById('createFirstGameBtn').addEventListener('click', () => {
+                    document.getElementById('addGameModal').classList.add('active');
+                });
+
+                // Add Member button
+                document.getElementById('addMemberBtn').addEventListener('click', () => {
+                    document.getElementById('addMemberModal').classList.add('active');
+                });
+
+                // Add Game form
+                document.getElementById('addGameForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const formData = {
+                        name: document.getElementById('gameName').value,
+                        description: document.getElementById('gameDescription').value,
+                        genre: document.getElementById('gameGenre').value
+                    };
+                    
+                    this.addGame(formData);
+                    closeModal('addGameModal');
+                    document.getElementById('addGameForm').reset();
+                });
+
+                // Add Member form
+                document.getElementById('addMemberForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const formData = {
+                        name: document.getElementById('memberName').value,
+                        role: document.getElementById('memberRole').value,
+                        email: document.getElementById('memberEmail').value
+                    };
+                    
+                    this.addMember(formData);
+                    closeModal('addMemberModal');
+                    document.getElementById('addMemberForm').reset();
+                });
+            }
+        }
+
+        // Global functions
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Initialize the game manager
+        const gameManager = new GameManager();
+
+        // Close modal when clicking outside
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('active');
             }
         });
     </script>
