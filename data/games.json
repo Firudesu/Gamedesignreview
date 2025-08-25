@@ -9,7 +9,20 @@
     "updatedAt": "2025-08-25T12:04:45.512Z",
     "issues": {
       "bug": [],
-      "controls": [],
+      "controls": [
+        {
+          "id": "1756123508143",
+          "title": "Movement issue",
+          "description": "test",
+          "category": "controls",
+          "priority": "low",
+          "urgency": "high",
+          "assignee": "1756123446705",
+          "status": "open",
+          "createdAt": "2025-08-25T12:05:08.143Z",
+          "updatedAt": "2025-08-25T12:05:08.143Z"
+        }
+      ],
       "quest": [],
       "review": []
     }
