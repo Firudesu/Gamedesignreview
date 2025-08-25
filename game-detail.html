@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Issues - Game Issue Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="header-left">
+                    <button id="backBtn" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </button>
+                    <h1 id="gameTitle">Loading...</h1>
+                </div>
+                <div class="header-actions">
+                    <button id="addIssueBtn" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> New Issue
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Category Tabs -->
+            <div class="category-tabs">
+                <button class="tab-btn active" data-category="all">All Issues</button>
+                <button class="tab-btn" data-category="bug">
+                    <i class="fas fa-bug"></i> Bugs
+                </button>
+                <button class="tab-btn" data-category="controls">
+                    <i class="fas fa-gamepad"></i> Controls
+                </button>
+                <button class="tab-btn" data-category="quest">
+                    <i class="fas fa-scroll"></i> Quests
+                </button>
+                <button class="tab-btn" data-category="review">
+                    <i class="fas fa-star"></i> Reviews
+                </button>
+            </div>
+
+            <!-- Issues List -->
+            <section class="issues-section">
+                <div id="issuesList" class="issues-list">
+                    <!-- Issues will be dynamically loaded here -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Add Issue Modal -->
+    <div id="addIssueModal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3>Add New Issue</h3>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addIssueForm">
+                    <div class="form-group">
+                        <label for="issueTitle">Title</label>
+                        <input type="text" id="issueTitle" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="issueCategory">Category</label>
+                            <select id="issueCategory" required>
+                                <option value="">Select category</option>
+                                <option value="bug">Bug</option>
+                                <option value="controls">Controls</option>
+                                <option value="quest">Quest</option>
+                                <option value="review">Review</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="urgencyGroup">
+                            <label for="issueUrgency">Urgency</label>
+                            <select id="issueUrgency">
+                                <option value="low">Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                                <option value="critical">Critical</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="issueDescription">Description</label>
+                        <textarea id="issueDescription" rows="5" required></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="issueAssignee">Assignee</label>
+                            <select id="issueAssignee">
+                                <option value="">Unassigned</option>
+                                <!-- Members will be populated here -->
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="issueStatus">Status</label>
+                            <select id="issueStatus">
+                                <option value="open">Open</option>
+                                <option value="in-progress">In Progress</option>
+                                <option value="review">Review</option>
+                                <option value="closed">Closed</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="issueMediaLinks">Media Links (one per line)</label>
+                        <textarea id="issueMediaLinks" rows="3" placeholder="Paste YouTube, Google Drive, or other hosted media links here"></textarea>
+                        <small class="form-help">Supported: YouTube, Google Drive, Imgur, etc.</small>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary cancel-btn">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Create Issue</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- View/Edit Issue Modal -->
+    <div id="viewIssueModal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3 id="viewIssueTitle">Issue Details</h3>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body" id="viewIssueContent">
+                <!-- Issue details will be dynamically loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="database.js"></script>
+    <script src="game-detail.js"></script>
+</body>
+</html>
