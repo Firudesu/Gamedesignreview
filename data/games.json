@@ -22,7 +22,20 @@
           "updatedAt": "2025-08-25T12:02:19.315Z"
         }
       ],
-      "controls": [],
+      "controls": [
+        {
+          "id": "1756123364823",
+          "title": "control ",
+          "description": "it was broke",
+          "category": "controls",
+          "priority": "high",
+          "urgency": "high",
+          "assignee": "",
+          "status": "open",
+          "createdAt": "2025-08-25T12:02:44.823Z",
+          "updatedAt": "2025-08-25T12:02:44.823Z"
+        }
+      ],
       "quest": [],
       "review": []
     }
