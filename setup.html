@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Design Review - Setup Wizard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .setup-container {
+            background: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .setup-header {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: #ffffff;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .setup-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .setup-header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .setup-content {
+            padding: 2rem;
+        }
+
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        .step h2 {
+            color: #1e293b;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .step p {
+            color: #64748b;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-full {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .setup-footer {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 2px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #3b82f6;
+            transition: width 0.3s ease;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin: 1rem 0;
+        }
+
+        .feature-list li {
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #374151;
+        }
+
+        .feature-list li i {
+            color: #10b981;
+            font-size: 1.1rem;
+        }
+
+        .team-member-input {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .team-member-input input {
+            flex: 1;
+        }
+
+        .team-members-list {
+            margin-top: 1rem;
+        }
+
+        .team-member-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background: #f8fafc;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .remove-member {
+            background: #fee2e2;
+            color: #991b1b;
+            border: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+
+        .success-message {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .success-message i {
+            font-size: 4rem;
+            color: #10b981;
+            margin-bottom: 1rem;
+        }
+
+        .success-message h2 {
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+
+        .success-message p {
+            color: #64748b;
+            margin-bottom: 2rem;
+        }
+
+        .link-card {
+            display: block;
+            padding: 1rem;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            color: #1e293b;
+            transition: all 0.2s ease;
+        }
+
+        .link-card:hover {
+            background: #f1f5f9;
+            border-color: #3b82f6;
+        }
+
+        .link-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .link-card p {
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="setup-container">
+        <div class="setup-header">
+            <h1><i class="fas fa-gamepad"></i> Game Design Review</h1>
+            <p>Setup Wizard - Get started in minutes</p>
+        </div>
+
+        <div class="setup-content">
+            <!-- Step 1: Welcome -->
+            <div class="step active" id="step1">
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 25%"></div>
+                </div>
+                <h2>Welcome to Game Design Review!</h2>
+                <p>This setup wizard will help you configure your game design review system. You'll be able to:</p>
+                <ul class="feature-list">
+                    <li><i class="fas fa-check"></i> Create and manage design review issues</li>
+                    <li><i class="fas fa-check"></i> Upload screenshots and videos</li>
+                    <li><i class="fas fa-check"></i> Draw annotations on images</li>
+                    <li><i class="fas fa-check"></i> Sync with Google Sheets</li>
+                    <li><i class="fas fa-check"></i> Assign tasks to team members</li>
+                    <li><i class="fas fa-check"></i> Track progress and completion</li>
+                </ul>
+                <button class="btn btn-primary btn-full" onclick="nextStep()">
+                    Get Started <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+
+            <!-- Step 2: Team Setup -->
+            <div class="step" id="step2">
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 50%"></div>
+                </div>
+                <h2>Add Your Team Members</h2>
+                <p>Add the team members who will be working on design reviews. You can always add more later.</p>
+                
+                <div class="form-group">
+                    <div class="team-member-input">
+                        <input type="text" id="memberName" placeholder="Team member name">
+                        <input type="email" id="memberEmail" placeholder="Email address">
+                        <button class="btn btn-secondary" onclick="addTeamMember()">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    </div>
+                </div>
+
+                <div class="team-members-list" id="teamMembersList">
+                    <!-- Team members will be listed here -->
+                </div>
+
+                <div class="setup-footer">
+                    <button class="btn btn-secondary" onclick="prevStep()">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </button>
+                    <button class="btn btn-primary" onclick="nextStep()">
+                        Continue <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 3: Google Sheets (Optional) -->
+            <div class="step" id="step3">
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 75%"></div>
+                </div>
+                <h2>Google Sheets Integration (Optional)</h2>
+                <p>Connect to Google Sheets to automatically sync your issues and collaborate with your team. This step is optional - you can skip it and configure later.</p>
+                
+                <div class="form-group">
+                    <label for="sheetsApiKey">Google Sheets API Key</label>
+                    <input type="password" id="sheetsApiKey" placeholder="Enter your API key (optional)">
+                    <small style="color: #64748b; font-size: 0.875rem;">
+                        Get your API key from <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a>
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="spreadsheetId">Spreadsheet ID</label>
+                    <input type="text" id="spreadsheetId" placeholder="Enter spreadsheet ID (optional)">
+                    <small style="color: #64748b; font-size: 0.875rem;">
+                        Found in the URL: https://docs.google.com/spreadsheets/d/[SPREADSHEET_ID]/edit
+                    </small>
+                </div>
+
+                <div class="setup-footer">
+                    <button class="btn btn-secondary" onclick="prevStep()">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </button>
+                    <button class="btn btn-primary" onclick="nextStep()">
+                        Continue <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 4: Complete -->
+            <div class="step" id="step4">
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 100%"></div>
+                </div>
+                <div class="success-message">
+                    <i class="fas fa-check-circle"></i>
+                    <h2>Setup Complete!</h2>
+                    <p>Your game design review system is ready to use. You can now create issues, upload media, and collaborate with your team.</p>
+                    
+                    <a href="game-design-review.html" class="link-card">
+                        <h3><i class="fas fa-rocket"></i> Launch Application</h3>
+                        <p>Open the main application and start creating your first design review issue</p>
+                    </a>
+                    
+                    <a href="GAME_DESIGN_REVIEW_README.md" class="link-card" style="margin-top: 1rem;">
+                        <h3><i class="fas fa-book"></i> Read Documentation</h3>
+                        <p>Learn about all features and how to use them effectively</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let teamMembers = [];
+
+        function showStep(step) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById(`step${step}`).classList.add('active');
+        }
+
+        function nextStep() {
+            if (currentStep < 4) {
+                currentStep++;
+                showStep(currentStep);
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        }
+
+        function addTeamMember() {
+            const name = document.getElementById('memberName').value.trim();
+            const email = document.getElementById('memberEmail').value.trim();
+            
+            if (name && email) {
+                const member = { id: Date.now().toString(), name, email };
+                teamMembers.push(member);
+                renderTeamMembers();
+                
+                // Clear inputs
+                document.getElementById('memberName').value = '';
+                document.getElementById('memberEmail').value = '';
+            }
+        }
+
+        function removeTeamMember(id) {
+            teamMembers = teamMembers.filter(m => m.id !== id);
+            renderTeamMembers();
+        }
+
+        function renderTeamMembers() {
+            const list = document.getElementById('teamMembersList');
+            list.innerHTML = teamMembers.map(member => `
+                <div class="team-member-item">
+                    <div>
+                        <strong>${member.name}</strong><br>
+                        <small style="color: #64748b;">${member.email}</small>
+                    </div>
+                    <button class="remove-member" onclick="removeTeamMember('${member.id}')">
+                        <i class="fas fa-times"></i> Remove
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Save settings when completing setup
+        function saveSettings() {
+            const settings = {
+                sheetsApiKey: document.getElementById('sheetsApiKey').value,
+                spreadsheetId: document.getElementById('spreadsheetId').value,
+                teamMembers: teamMembers
+            };
+            
+            localStorage.setItem('gameReviewSettings', JSON.stringify(settings));
+            localStorage.setItem('gameReviewTeamMembers', JSON.stringify(teamMembers));
+        }
+
+        // Override nextStep for final step to save settings
+        const originalNextStep = nextStep;
+        nextStep = function() {
+            if (currentStep === 3) {
+                saveSettings();
+            }
+            originalNextStep();
+        };
+
+        // Load existing settings if available
+        window.addEventListener('load', () => {
+            const savedSettings = localStorage.getItem('gameReviewSettings');
+            if (savedSettings) {
+                const settings = JSON.parse(savedSettings);
+                document.getElementById('sheetsApiKey').value = settings.sheetsApiKey || '';
+                document.getElementById('spreadsheetId').value = settings.spreadsheetId || '';
+            }
+            
+            const savedTeamMembers = localStorage.getItem('gameReviewTeamMembers');
+            if (savedTeamMembers) {
+                teamMembers = JSON.parse(savedTeamMembers);
+                renderTeamMembers();
+            }
+        });
+    </script>
+</body>
+</html>
