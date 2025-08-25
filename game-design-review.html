@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Design Review System</title>
+    <link rel="stylesheet" href="game-review-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1><i class="fas fa-gamepad"></i> Game Design Review</h1>
+                <div class="header-actions">
+                    <button id="syncBtn" class="btn btn-primary">
+                        <i class="fas fa-sync"></i> Sync with Sheets
+                    </button>
+                    <button id="settingsBtn" class="btn btn-secondary">
+                        <i class="fas fa-cog"></i> Settings
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h3>Quick Actions</h3>
+                    <button id="newIssueBtn" class="btn btn-primary btn-full">
+                        <i class="fas fa-plus"></i> New Issue
+                    </button>
+                    <button id="uploadMediaBtn" class="btn btn-secondary btn-full">
+                        <i class="fas fa-upload"></i> Upload Media
+                    </button>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>Filters</h3>
+                    <div class="filter-group">
+                        <label>Status:</label>
+                        <select id="statusFilter" class="filter-select">
+                            <option value="all">All Status</option>
+                            <option value="open">Open</option>
+                            <option value="in-progress">In Progress</option>
+                            <option value="review">Under Review</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Priority:</label>
+                        <select id="priorityFilter" class="filter-select">
+                            <option value="all">All Priorities</option>
+                            <option value="critical">Critical</option>
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Assignee:</label>
+                        <select id="assigneeFilter" class="filter-select">
+                            <option value="all">All Assignees</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>Statistics</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-number" id="totalIssues">0</span>
+                            <span class="stat-label">Total Issues</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="openIssues">0</span>
+                            <span class="stat-label">Open</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="completedIssues">0</span>
+                            <span class="stat-label">Completed</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Area -->
+            <div class="main-area">
+                <!-- Issues List -->
+                <div class="issues-container">
+                    <div class="issues-header">
+                        <h2>Design Review Issues</h2>
+                        <div class="issues-actions">
+                            <input type="text" id="searchIssues" placeholder="Search issues..." class="search-input">
+                            <button id="exportBtn" class="btn btn-secondary">
+                                <i class="fas fa-download"></i> Export
+                            </button>
+                        </div>
+                    </div>
+                    <div id="issuesList" class="issues-list">
+                        <!-- Issues will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- New Issue Modal -->
+    <div id="newIssueModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create New Issue</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="newIssueForm">
+                    <div class="form-group">
+                        <label for="issueTitle">Title *</label>
+                        <input type="text" id="issueTitle" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="issuePriority">Priority</label>
+                            <select id="issuePriority">
+                                <option value="low">Low</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="high">High</option>
+                                <option value="critical">Critical</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="issueAssignee">Assignee</label>
+                            <select id="issueAssignee">
+                                <option value="">Unassigned</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="issueDescription">Description</label>
+                        <textarea id="issueDescription" rows="4"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="issueCategory">Category</label>
+                        <select id="issueCategory">
+                            <option value="ui">UI/UX</option>
+                            <option value="gameplay">Gameplay</option>
+                            <option value="art">Art/Visual</option>
+                            <option value="audio">Audio</option>
+                            <option value="performance">Performance</option>
+                            <option value="bug">Bug</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Attachments</label>
+                        <div class="file-upload-area" id="fileUploadArea">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Drag & drop files here or click to browse</p>
+                            <input type="file" id="fileInput" multiple accept="image/*,video/*" style="display: none;">
+                        </div>
+                        <div id="filePreview" class="file-preview"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancelIssue">Cancel</button>
+                <button type="submit" class="btn btn-primary" form="newIssueForm">Create Issue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Issue Detail Modal -->
+    <div id="issueDetailModal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3 id="detailIssueTitle">Issue Title</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="issue-detail-content">
+                    <div class="issue-info">
+                        <div class="issue-meta">
+                            <span class="issue-status" id="detailIssueStatus">Open</span>
+                            <span class="issue-priority" id="detailIssuePriority">Medium</span>
+                            <span class="issue-assignee" id="detailIssueAssignee">Unassigned</span>
+                        </div>
+                        <div class="issue-description" id="detailIssueDescription">
+                            Issue description will appear here...
+                        </div>
+                    </div>
+                    <div class="issue-media">
+                        <h4>Media & Annotations</h4>
+                        <div id="mediaContainer" class="media-container">
+                            <!-- Media items will be displayed here -->
+                        </div>
+                    </div>
+                    <div class="issue-comments">
+                        <h4>Comments</h4>
+                        <div id="commentsList" class="comments-list">
+                            <!-- Comments will be displayed here -->
+                        </div>
+                        <div class="comment-form">
+                            <textarea id="newComment" placeholder="Add a comment..."></textarea>
+                            <button id="addCommentBtn" class="btn btn-primary">Add Comment</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="closeDetail">Close</button>
+                <button type="button" class="btn btn-primary" id="markComplete">Mark Complete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Annotation Modal -->
+    <div id="annotationModal" class="modal">
+        <div class="modal-content modal-full">
+            <div class="modal-header">
+                <h3>Image Annotation</h3>
+                <div class="annotation-tools">
+                    <button id="drawTool" class="tool-btn active" title="Draw">
+                        <i class="fas fa-pen"></i>
+                    </button>
+                    <button id="arrowTool" class="tool-btn" title="Arrow">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <button id="textTool" class="tool-btn" title="Text">
+                        <i class="fas fa-font"></i>
+                    </button>
+                    <button id="circleTool" class="tool-btn" title="Circle">
+                        <i class="fas fa-circle"></i>
+                    </button>
+                    <button id="rectTool" class="tool-btn" title="Rectangle">
+                        <i class="fas fa-square"></i>
+                    </button>
+                    <input type="color" id="colorPicker" value="#ff0000" title="Color">
+                    <input type="range" id="brushSize" min="1" max="20" value="3" title="Brush Size">
+                    <button id="clearCanvas" class="tool-btn" title="Clear">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="annotation-container">
+                    <canvas id="annotationCanvas"></canvas>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancelAnnotation">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveAnnotation">Save Annotation</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Settings</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-section">
+                    <h4>Google Sheets Integration</h4>
+                    <div class="form-group">
+                        <label for="sheetsApiKey">API Key</label>
+                        <input type="password" id="sheetsApiKey" placeholder="Enter your Google Sheets API key">
+                    </div>
+                    <div class="form-group">
+                        <label for="spreadsheetId">Spreadsheet ID</label>
+                        <input type="text" id="spreadsheetId" placeholder="Enter spreadsheet ID">
+                        <small>Found in the URL: https://docs.google.com/spreadsheets/d/[SPREADSHEET_ID]/edit</small>
+                    </div>
+                    <button id="testConnectionBtn" class="btn btn-secondary">Test Connection</button>
+                </div>
+                <div class="settings-section">
+                    <h4>Team Members</h4>
+                    <div id="teamMembersList" class="team-members-list">
+                        <!-- Team members will be listed here -->
+                    </div>
+                    <button id="addTeamMemberBtn" class="btn btn-secondary">Add Team Member</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancelSettings">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveSettings">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden file input for media upload -->
+    <input type="file" id="mediaFileInput" multiple accept="image/*,video/*" style="display: none;">
+
+    <!-- Scripts -->
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="game-review.js"></script>
+</body>
+</html>
