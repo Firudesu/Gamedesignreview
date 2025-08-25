@@ -34,6 +34,18 @@
           "status": "open",
           "createdAt": "2025-08-25T12:02:44.823Z",
           "updatedAt": "2025-08-25T12:02:44.823Z"
+        },
+        {
+          "id": "1756123468661",
+          "title": "Movement issue",
+          "description": "",
+          "category": "controls",
+          "priority": "medium",
+          "urgency": "medium",
+          "assignee": "1756123446705",
+          "status": "open",
+          "createdAt": "2025-08-25T12:04:28.661Z",
+          "updatedAt": "2025-08-25T12:04:28.661Z"
         }
       ],
       "quest": [],
