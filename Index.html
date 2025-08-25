@@ -3,180 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Design Review System</title>
+    <title>Game Issue Tracker</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-        }
-
-        .container {
-            background: #ffffff;
-            border-radius: 1rem;
-            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            width: 100%;
-            overflow: hidden;
-            text-align: center;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-            color: #ffffff;
-            padding: 2rem;
-        }
-
-        .header h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .header p {
-            opacity: 0.9;
-            font-size: 1.1rem;
-        }
-
-        .content {
-            padding: 2rem;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 1rem 2rem;
-            margin: 0.5rem;
-            border: none;
-            border-radius: 0.5rem;
-            font-size: 1rem;
-            font-weight: 500;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .btn-primary {
-            background: #3b82f6;
-            color: #ffffff;
-        }
-
-        .btn-primary:hover {
-            background: #2563eb;
-        }
-
-        .btn-secondary {
-            background: #f1f5f9;
-            color: #475569;
-            border: 1px solid #cbd5e1;
-        }
-
-        .btn-secondary:hover {
-            background: #e2e8f0;
-        }
-
-        .features {
-            margin: 2rem 0;
-            text-align: left;
-        }
-
-        .features h3 {
-            color: #1e293b;
-            margin-bottom: 1rem;
-        }
-
-        .feature-list {
-            list-style: none;
-        }
-
-        .feature-list li {
-            padding: 0.5rem 0;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            color: #374151;
-        }
-
-        .feature-list li i {
-            color: #10b981;
-            font-size: 1.1rem;
-        }
-
-        .footer {
-            padding: 1rem;
-            border-top: 1px solid #e2e8f0;
-            color: #64748b;
-            font-size: 0.875rem;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1><i class="fas fa-gamepad"></i> Game Design Review System</h1>
-            <p>Streamline your game design review process</p>
-        </div>
-
-        <div class="content">
-            <div class="features">
-                <h3>What you can do:</h3>
-                <ul class="feature-list">
-                    <li><i class="fas fa-check"></i> Create and manage design review issues</li>
-                    <li><i class="fas fa-check"></i> Upload screenshots and videos</li>
-                    <li><i class="fas fa-check"></i> Draw annotations on images</li>
-                    <li><i class="fas fa-check"></i> Sync with Google Sheets</li>
-                    <li><i class="fas fa-check"></i> Assign tasks to team members</li>
-                    <li><i class="fas fa-check"></i> Track progress and completion</li>
-                </ul>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1><i class="fas fa-gamepad"></i> Game Issue Tracker</h1>
+                <div class="header-actions">
+                    <button id="addMemberBtn" class="btn btn-secondary">
+                        <i class="fas fa-user-plus"></i> Add Member
+                    </button>
+                    <button id="addGameBtn" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Game
+                    </button>
+                </div>
             </div>
+        </header>
 
-            <div class="actions">
-                <a href="setup.html" class="btn btn-primary">
-                    <i class="fas fa-rocket"></i> Get Started
-                </a>
-                <a href="game-design-review.html" class="btn btn-secondary">
-                    <i class="fas fa-play"></i> Launch App
-                </a>
-                <a href="demo.html" class="btn btn-secondary">
-                    <i class="fas fa-eye"></i> View Demo
-                </a>
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Games List -->
+            <section class="games-section">
+                <h2>Games</h2>
+                <div id="gamesList" class="games-grid">
+                    <!-- Games will be dynamically loaded here -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Add Game Modal -->
+    <div id="addGameModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Game</h3>
+                <button class="close-btn">&times;</button>
             </div>
-        </div>
-
-        <div class="footer">
-            <p>Choose an option above to get started with your game design reviews</p>
+            <div class="modal-body">
+                <form id="addGameForm">
+                    <div class="form-group">
+                        <label for="gameName">Game Name</label>
+                        <input type="text" id="gameName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="gameDescription">Description</label>
+                        <textarea id="gameDescription" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="gamePlatform">Platform</label>
+                        <select id="gamePlatform">
+                            <option value="PC">PC</option>
+                            <option value="Console">Console</option>
+                            <option value="Mobile">Mobile</option>
+                            <option value="Multi-platform">Multi-platform</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary cancel-btn">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Add Game</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
-    <script>
-        // Check if user has already set up the system
-        window.addEventListener('load', () => {
-            const hasSettings = localStorage.getItem('gameReviewSettings');
-            const hasTeamMembers = localStorage.getItem('gameReviewTeamMembers');
-            
-            if (hasSettings && hasTeamMembers) {
-                // User has already set up, suggest going directly to app
-                const setupBtn = document.querySelector('a[href="setup.html"]');
-                if (setupBtn) {
-                    setupBtn.innerHTML = '<i class="fas fa-cog"></i> Settings';
-                    setupBtn.href = 'game-design-review.html#settings';
-                }
-            }
-        });
-    </script>
+    <!-- Add Member Modal -->
+    <div id="addMemberModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Team Member</h3>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addMemberForm">
+                    <div class="form-group">
+                        <label for="memberName">Name</label>
+                        <input type="text" id="memberName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="memberRole">Role</label>
+                        <select id="memberRole">
+                            <option value="Designer">Designer</option>
+                            <option value="Developer">Developer</option>
+                            <option value="Tester">Tester</option>
+                            <option value="Project Manager">Project Manager</option>
+                            <option value="Artist">Artist</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="memberEmail">Email</label>
+                        <input type="email" id="memberEmail">
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary cancel-btn">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Add Member</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="database.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>

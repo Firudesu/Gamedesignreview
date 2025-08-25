@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Game Issue Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+        #output {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 5px;
+            min-height: 100px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Game Issue Tracker - Test Page</h1>
+    
+    <div class="test-section">
+        <h2>Database Test</h2>
+        <button onclick="testDatabase()">Test Database Connection</button>
+        <button onclick="addTestGame()">Add Test Game</button>
+        <button onclick="addTestMember()">Add Test Member</button>
+        <button onclick="addTestIssue()">Add Test Issue</button>
+        <button onclick="viewAllData()">View All Data</button>
+        <button onclick="clearDatabase()">Clear Database</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Navigation</h2>
+        <button onclick="window.location.href='Index.html'">Go to Main App</button>
+    </div>
+
+    <div id="output">
+        <h3>Output:</h3>
+        <pre id="outputText">Click a button to test...</pre>
+    </div>
+
+    <script src="database.js"></script>
+    <script>
+        let testGameId = null;
+        let testMemberId = null;
+
+        function log(message) {
+            document.getElementById('outputText').textContent += '\n' + message;
+        }
+
+        function clearLog() {
+            document.getElementById('outputText').textContent = '';
+        }
+
+        async function testDatabase() {
+            clearLog();
+            try {
+                await db.init();
+                log('✅ Database initialized successfully!');
+            } catch (error) {
+                log('❌ Database error: ' + error.message);
+            }
+        }
+
+        async function addTestGame() {
+            clearLog();
+            try {
+                await db.init();
+                const gameData = {
+                    name: 'Test Game ' + Date.now(),
+                    description: 'This is a test game for development',
+                    platform: 'PC'
+                };
+                testGameId = await db.addGame(gameData);
+                log('✅ Game added successfully! ID: ' + testGameId);
+                log('Game data: ' + JSON.stringify(gameData, null, 2));
+            } catch (error) {
+                log('❌ Error adding game: ' + error.message);
+            }
+        }
+
+        async function addTestMember() {
+            clearLog();
+            try {
+                await db.init();
+                const memberData = {
+                    name: 'Test User ' + Date.now(),
+                    role: 'Developer',
+                    email: 'test' + Date.now() + '@example.com'
+                };
+                testMemberId = await db.addMember(memberData);
+                log('✅ Member added successfully! ID: ' + testMemberId);
+                log('Member data: ' + JSON.stringify(memberData, null, 2));
+            } catch (error) {
+                log('❌ Error adding member: ' + error.message);
+            }
+        }
+
+        async function addTestIssue() {
+            clearLog();
+            try {
+                await db.init();
+                
+                // Get first game if no test game
+                if (!testGameId) {
+                    const games = await db.getGames();
+                    if (games.length === 0) {
+                        log('❌ No games found. Please add a game first.');
+                        return;
+                    }
+                    testGameId = games[0].id;
+                }
+
+                const issueData = {
+                    gameId: testGameId,
+                    title: 'Test Issue ' + Date.now(),
+                    category: ['bug', 'controls', 'quest', 'review'][Math.floor(Math.random() * 4)],
+                    urgency: ['low', 'medium', 'high', 'critical'][Math.floor(Math.random() * 4)],
+                    description: 'This is a test issue description with some details about the problem.',
+                    assigneeId: testMemberId,
+                    status: 'open',
+                    mediaLinks: [
+                        'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                        'https://drive.google.com/file/d/example/view'
+                    ]
+                };
+
+                // Reviews don't need urgency
+                if (issueData.category === 'review') {
+                    issueData.urgency = 'low';
+                }
+
+                const issueId = await db.addIssue(issueData);
+                log('✅ Issue added successfully! ID: ' + issueId);
+                log('Issue data: ' + JSON.stringify(issueData, null, 2));
+            } catch (error) {
+                log('❌ Error adding issue: ' + error.message);
+            }
+        }
+
+        async function viewAllData() {
+            clearLog();
+            try {
+                await db.init();
+                
+                const games = await db.getGames();
+                log('GAMES (' + games.length + '):');
+                games.forEach(game => {
+                    log('  - ' + game.name + ' (ID: ' + game.id + ')');
+                });
+
+                const members = await db.getMembers();
+                log('\nMEMBERS (' + members.length + '):');
+                members.forEach(member => {
+                    log('  - ' + member.name + ' - ' + member.role + ' (ID: ' + member.id + ')');
+                });
+
+                log('\nISSUES BY GAME:');
+                for (const game of games) {
+                    const issues = await db.getIssuesByGame(game.id);
+                    log('\n' + game.name + ' (' + issues.length + ' issues):');
+                    issues.forEach(issue => {
+                        log('  - [' + issue.category + '/' + issue.urgency + '] ' + issue.title);
+                    });
+                }
+            } catch (error) {
+                log('❌ Error viewing data: ' + error.message);
+            }
+        }
+
+        async function clearDatabase() {
+            clearLog();
+            if (!confirm('Are you sure you want to clear all data?')) {
+                log('Cancelled.');
+                return;
+            }
+
+            try {
+                await db.init();
+                
+                // Delete all games (which also deletes their issues)
+                const games = await db.getGames();
+                for (const game of games) {
+                    await db.deleteGame(game.id);
+                }
+
+                // Delete all members
+                const members = await db.getMembers();
+                for (const member of members) {
+                    await db.deleteMember(member.id);
+                }
+
+                log('✅ Database cleared successfully!');
+            } catch (error) {
+                log('❌ Error clearing database: ' + error.message);
+            }
+        }
+
+        // Initialize on load
+        window.onload = async function() {
+            await testDatabase();
+        };
+    </script>
+</body>
+</html>
