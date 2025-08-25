@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Design Review - Demo</title>
+    <link rel="stylesheet" href="game-review-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .demo-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+
+        .demo-header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .demo-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .demo-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .demo-section {
+            padding: 3rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .demo-section h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: #1e293b;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.2s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-card i {
+            font-size: 3rem;
+            color: #3b82f6;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #1e293b;
+        }
+
+        .feature-card p {
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        .demo-screenshot {
+            text-align: center;
+            margin: 3rem 0;
+        }
+
+        .demo-screenshot img {
+            max-width: 100%;
+            border-radius: 1rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .cta-section {
+            background: #f8fafc;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #1e293b;
+        }
+
+        .cta-section p {
+            font-size: 1.2rem;
+            color: #64748b;
+            margin-bottom: 2rem;
+        }
+
+        .btn-large {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-header">
+        <h1><i class="fas fa-gamepad"></i> Game Design Review System</h1>
+        <p>A comprehensive tool for managing game design reviews with advanced annotation features</p>
+        <div class="demo-actions">
+            <a href="setup.html" class="btn btn-primary btn-large">
+                <i class="fas fa-rocket"></i> Get Started
+            </a>
+            <a href="game-design-review.html" class="btn btn-secondary btn-large">
+                <i class="fas fa-play"></i> Try Demo
+            </a>
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h2>Key Features</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <i class="fas fa-tasks"></i>
+                <h3>Issue Management</h3>
+                <p>Create, track, and manage design review issues with priority levels, assignments, and status tracking.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-upload"></i>
+                <h3>Media Upload</h3>
+                <p>Drag and drop screenshots and videos. Support for multiple file types with instant preview.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-pen"></i>
+                <h3>Image Annotation</h3>
+                <p>Draw directly on images with multiple tools: arrows, circles, text, and freehand drawing.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-users"></i>
+                <h3>Team Collaboration</h3>
+                <p>Assign issues to team members, add comments, and track progress in real-time.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-table"></i>
+                <h3>Google Sheets Sync</h3>
+                <p>Automatically sync all issues with Google Sheets for easy sharing and backup.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-chart-bar"></i>
+                <h3>Analytics & Reports</h3>
+                <p>Track progress with real-time statistics and comprehensive reporting features.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h2>How It Works</h2>
+        <div class="demo-screenshot">
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjYwMCIgdmlld0JveD0iMCAwIDgwMCA2MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNjAwIiBmaWxsPSIjRjhGQUZDIi8+CjxyZWN0IHg9IjUwIiB5PSI1MCIgd2lkdGg9IjcwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IndoaXRlIiBzdHJva2U9IiNFMkU4RjAiIHN0cm9rZS13aWR0aD0iMiIgcng9IjgiLz4KPHRleHQgeD0iNzAiIHk9IjkwIiBmb250LWZhbWlseT0iSW50ZXIiIGZvbnQtc2l6ZT0iMjQiIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IiMxRUI5M0IiPkdhbWUgRGVzaWduIFJldmlldyBTeXN0ZW08L3RleHQ+CjxyZWN0IHg9IjcwIiB5PSIxMjAiIHdpZHRoPSIxNjAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjhGQUZDIiBzdHJva2U9IiNFMkU4RjAiIHN0cm9rZS13aWR0aD0iMSIgcng9IjQiLz4KPHRleHQgeD0iODAiIHk9IjE0MCIgZm9udC1mYW1pbHk9IkludGVyIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iNjAwIiBmaWxsPSIjNjQ3NDhCIj5RdWljayBBY3Rpb25zPC90ZXh0Pgo8cmVjdCB4PSI4MCIgeT0iMTYwIiB3aWR0aD0iMTQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjM0I4MkY2IiByeD0iNCIvPgo8dGV4dCB4PSI5MCIgeT0iMTg1IiBmb250LWZhbWlseT0iSW50ZXIiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IndoaXRlIj5OZXcgSXNzdWU8L3RleHQ+CjxyZWN0IHg9IjgwIiB5PSIyMTAiIHdpZHRoPSIxNDAiIGhlaWdodD0iNDAiIGZpbGw9IiNGMUU1RjkiIHN0cm9rZT0iI0NCREU1RCIgcng9IjQiLz4KPHRleHQgeD0iOTAiIHk9IjIzNSIgZm9udC1mYW1pbHk9IkludGVyIiBmb250LXNpemU9IjEyIiBmaWxsPSIjNDc1NTY5Ij5VcGxvYWQgTWVkaWE8L3RleHQ+CjxyZWN0IHg9IjI1MCIgeT0iMTIwIiB3aWR0aD0iNTAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iI0Y4RkFGQyIgc3Ryb2tlPSIjRTJFOEYwIiBzdHJva2Utd2lkdGg9IjEiIHJ4PSI0Ii8+Cjx0ZXh0IHg9IjI3MCIgeT0iMTUwIiBmb250LWZhbWlseT0iSW50ZXIiIGZvbnQtc2l6ZT0iMTgiIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IiMxRUI5M0IiPkRlc2lnbiBSZXZpZXcgSXNzdWVzPC90ZXh0Pgo8cmVjdCB4PSIyNzAiIHk9IjE4MCIgd2lkdGg9IjQ2MCIgaGVpZ2h0PSI4MCIgZmlsbD0id2hpdGUiIHN0cm9rZT0iI0UyRThGMCIgc3Ryb2tlLXdpZHRoPSIxIiByeD0iNCIvPgo8dGV4dCB4PSIyODAiIHk9IjIwMCIgZm9udC1mYW1pbHk9IkludGVyIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iNjAwIiBmaWxsPSIjMUVCOU5CIj5VSSBMYXlvdXQgSXNzdWU8L3RleHQ+Cjx0ZXh0IHg9IjI4MCIgeT0iMjIwIiBmb250LWZhbWlseT0iSW50ZXIiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiM2NDc0OEIiPkNyZWF0ZWQ6IDIwMjQtMDEtMTUg4oCTIEFzc2lnbmVkOiBKb2huIERvZTwvdGV4dD4KPHRleHQgeD0iMjgwIiB5PSIyNDAiIGZvbnQtZmFtaWx5PSJJbnRlciIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzY0NzQ4QiI+UHJpb3JpdHk6IEhpZ2gg4oCTIFN0YXR1czogT3BlbjwvdGV4dD4KPHRleHQgeD0iNjUwIiB5PSIyMDAiIGZvbnQtZmFtaWx5PSJJbnRlciIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzEwQjk4MSI+4pyFPC90ZXh0Pgo8cmVjdCB4PSIyNzAiIHk9IjI4MCIgd2lkdGg9IjQ2MCIgaGVpZ2h0PSI4MCIgZmlsbD0id2hpdGUiIHN0cm9rZT0iI0UyRThGMCIgc3Ryb2tlLXdpZHRoPSIxIiByeD0iNCIvPgo8dGV4dCB4PSIyODAiIHk9IjMwMCIgZm9udC1mYW1pbHk9IkludGVyIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iNjAwIiBmaWxsPSIjMUVCOU5CIj5BdWRpbyBRdWFsaXR5PC90ZXh0Pgo8dGV4dCB4PSIyODAiIHk9IjMyMCIgZm9udC1mYW1pbHk9IkludGVyIiBmb250LXNpemU9IjEyIiBmaWxsPSIjNjQ3NDhCIj5DcmVhdGVkOiAyMDI0LTAxLTE0IOKAkyBBc3NpZ25lZDogSmFuZSBTbWl0aDwvdGV4dD4KPHRleHQgeD0iMjgwIiB5PSIzNDAiIGZvbnQtZmFtaWx5PSJJbnRlciIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzY0NzQ4QiI+UHJpb3JpdHk6IE1lZGl1bSDigJMgU3RhdHVzOiBJbiBQcm9ncmVzczwvdGV4dD4KPHRleHQgeD0iNjUwIiB5PSIzMDAiIGZvbnQtZmFtaWx5PSJJbnRlciIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzNCODJGNiI+4pyFPC90ZXh0Pgo8cmVjdCB4PSIyNzAiIHk9IjM4MCIgd2lkdGg9IjQ2MCIgaGVpZ2h0PSI4MCIgZmlsbD0id2hpdGUiIHN0cm9rZT0iI0UyRThGMCIgc3Ryb2tlLXdpZHRoPSIxIiByeD0iNCIvPgo8dGV4dCB4PSIyODAiIHk9IjQwMCIgZm9udC1mYW1pbHk9IkludGVyIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iNjAwIiBmaWxsPSIjMUVCOU5CIj5QZXJmb3JtYW5jZSBPcHRpbWl6YXRpb248L3RleHQ+Cjx0ZXh0IHg9IjI4MCIgeT0iNDIwIiBmb250LWZhbWlseT0iSW50ZXIiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiM2NDc0OEIiPkNyZWF0ZWQ6IDIwMjQtMDEtMTMg4oCTIEFzc2lnbmVkOiBCb2IgV2lsc29uPC90ZXh0Pgo8dGV4dCB4PSIyODAiIHk9IjQ0MCIgZm9udC1mYW1pbHk9IkludGVyIiBmb250LXNpemU9IjEyIiBmaWxsPSIjNjQ3NDhCIj5Qcmlvcml0eTogQ3JpdGljYWwg4oCTIFN0YXR1czogQ29tcGxldGVkPC90ZXh0Pgo8dGV4dCB4PSI2NTAiIHk9IjQwMCIgZm9udC1mYW1pbHk9IkludGVyIiBmb250LXNpemU9IjEyIiBmaWxsPSIjMTBCOTgxIj7inKU8L3RleHQ+CjxyZWN0IHg9IjcwIiB5PSI0NDAiIHdpZHRoPSIxNjAiIGhlaWdodD0iMTUwIiBmaWxsPSIjRjhGQUZDIiBzdHJva2U9IiNFMkU4RjAiIHN0cm9rZS13aWR0aD0iMSIgcng9IjQiLz4KPHRleHQgeD0iODAiIHk9IjQ2MCIgZm9udC1mYW1pbHk9IkludGVyIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iNjAwIiBmaWxsPSIjNjQ3NDhCIj5TdGF0aXN0aWNzPC90ZXh0Pgo8Y2lyY2xlIGN4PSIxNTAiIGN5PSI1MDAiIHI9IjMwIiBmaWxsPSIjM0I4MkY2Ii8+Cjx0ZXh0IHg9IjE1MCIgeT0iNTA4IiBmb250LWZhbWlseT0iSW50ZXIiIGZvbnQtc2l6ZT0iMTIiIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj4xMjwvdGV4dD4KPHRleHQgeD0iMTUwIiB5PSI1MzAiIGZvbnQtZmFtaWx5PSJJbnRlciIgZm9udC1zaXplPSIxMCIgZmlsbD0iIzY0NzQ4QiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+VG90YWw8L3RleHQ+CjxjaXJjbGUgY3g9IjE1MCIgY3k9IjU2MCIgcj0iMjUiIGZpbGw9IiNGRjZCMzUiLz4KPHRleHQgeD0iMTUwIiB5PSI1NjgiIGZvbnQtZmFtaWx5PSJJbnRlciIgZm9udC1zaXplPSIxMiIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPjg8L3RleHQ+Cjx0ZXh0IHg9IjE1MCIgeT0iNTg1IiBmb250LWZhbWlseT0iSW50ZXIiIGZvbnQtc2l6ZT0iMTAiIGZpbGw9IiM2NDc0OEIiIHRleHQtYW5jaG9yPSJtaWRkbGUiPk9wZW48L3RleHQ+CjxjaXJjbGUgY3g9IjE1MCIgY3k9IjYxMCIgcj0iMjAiIGZpbGw9IiMxMEI5ODEiLz4KPHRleHQgeD0iMTUwIiB5PSI2MTgiIGZvbnQtZmFtaWx5PSJJbnRlciIgZm9udC1zaXplPSIxMiIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPjQ8L3RleHQ+Cjx0ZXh0IHg9IjE1MCIgeT0iNjM1IiBmb250LWZhbWlseT0iSW50ZXIiIGZvbnQtc2l6ZT0iMTAiIGZpbGw9IiM2NDc0OEIiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkRvbmU8L3RleHQ+Cjwvc3ZnPgo=" alt="Game Design Review System Interface" />
+        </div>
+    </div>
+
+    <div class="cta-section">
+        <h2>Ready to Streamline Your Design Reviews?</h2>
+        <p>Join thousands of game developers who are already using our system to improve their workflow</p>
+        <div class="demo-actions">
+            <a href="setup.html" class="btn btn-primary btn-large">
+                <i class="fas fa-rocket"></i> Start Free Setup
+            </a>
+            <a href="GAME_DESIGN_REVIEW_README.md" class="btn btn-secondary btn-large">
+                <i class="fas fa-book"></i> Read Documentation
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Add some sample data for the demo
+        window.addEventListener('load', () => {
+            // Check if we should load demo data
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('demo') === 'true') {
+                loadDemoData();
+            }
+        });
+
+        function loadDemoData() {
+            const demoIssues = [
+                {
+                    id: '1',
+                    title: 'UI Layout Issue',
+                    description: 'The main menu buttons are not properly aligned on mobile devices. Need to adjust the responsive design.',
+                    priority: 'high',
+                    assignee: 'john-doe',
+                    category: 'ui',
+                    status: 'open',
+                    createdAt: '2024-01-15T10:30:00Z',
+                    updatedAt: '2024-01-15T10:30:00Z',
+                    media: [],
+                    comments: []
+                },
+                {
+                    id: '2',
+                    title: 'Audio Quality Problem',
+                    description: 'Background music is too loud and drowns out the sound effects. Need to adjust volume levels.',
+                    priority: 'medium',
+                    assignee: 'jane-smith',
+                    category: 'audio',
+                    status: 'in-progress',
+                    createdAt: '2024-01-14T14:20:00Z',
+                    updatedAt: '2024-01-15T09:15:00Z',
+                    media: [],
+                    comments: []
+                },
+                {
+                    id: '3',
+                    title: 'Performance Optimization',
+                    description: 'Frame rate drops significantly when multiple enemies are on screen. Need to optimize rendering.',
+                    priority: 'critical',
+                    assignee: 'bob-wilson',
+                    category: 'performance',
+                    status: 'completed',
+                    createdAt: '2024-01-13T16:45:00Z',
+                    updatedAt: '2024-01-14T11:30:00Z',
+                    media: [],
+                    comments: []
+                }
+            ];
+
+            const demoTeamMembers = [
+                { id: 'john-doe', name: 'John Doe', email: 'john@studio.com' },
+                { id: 'jane-smith', name: 'Jane Smith', email: 'jane@studio.com' },
+                { id: 'bob-wilson', name: 'Bob Wilson', email: 'bob@studio.com' }
+            ];
+
+            localStorage.setItem('gameReviewIssues', JSON.stringify(demoIssues));
+            localStorage.setItem('gameReviewTeamMembers', JSON.stringify(demoTeamMembers));
+        }
+    </script>
+</body>
+</html>
