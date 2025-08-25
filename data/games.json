@@ -8,7 +8,20 @@
     "createdAt": "2025-08-25T12:01:57.028Z",
     "updatedAt": "2025-08-25T12:01:57.028Z",
     "issues": {
-      "bug": [],
+      "bug": [
+        {
+          "id": "1756123339315",
+          "title": "Movement issue",
+          "description": "test",
+          "category": "bug",
+          "priority": "medium",
+          "urgency": "medium",
+          "assignee": "",
+          "status": "open",
+          "createdAt": "2025-08-25T12:02:19.315Z",
+          "updatedAt": "2025-08-25T12:02:19.315Z"
+        }
+      ],
       "controls": [],
       "quest": [],
       "review": []
