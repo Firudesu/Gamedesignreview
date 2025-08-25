@@ -198,6 +198,38 @@
             <div id="taskDetailContent">
                 <!-- Task details will be populated here -->
             </div>
+            <div class="modal-actions">
+                <button id="completeTaskBtn" class="btn btn-success" style="display: none;">
+                    <i class="fas fa-check"></i> Mark as Complete
+                </button>
+                <button id="reopenTaskBtn" class="btn btn-secondary" style="display: none;">
+                    <i class="fas fa-undo"></i> Reopen Task
+                </button>
+                <button id="deleteTaskBtn" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Delete Task
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Task Confirmation Modal -->
+    <div id="deleteTaskModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Delete Task</h2>
+                <button class="close-btn" onclick="closeModal('deleteTaskModal')">&times;</button>
+            </div>
+            <div style="padding: 1rem 0;">
+                <p style="color: #64748b; margin-bottom: 1.5rem; line-height: 1.6;">
+                    Are you sure you want to delete this task? This action cannot be undone.
+                </p>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('deleteTaskModal')">Cancel</button>
+                <button type="button" class="btn btn-danger" onclick="gameReview.confirmDeleteTask()">
+                    <i class="fas fa-trash"></i> Delete Task
+                </button>
+            </div>
         </div>
     </div>
 

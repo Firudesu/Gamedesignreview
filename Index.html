@@ -26,23 +26,26 @@
         }
 
         .header {
-            background: #ffffff;
-            border-radius: 1rem;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             padding: 2rem;
             margin-bottom: 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .header h1 {
             color: #1e293b;
-            font-size: 2rem;
+            font-size: 2.25rem;
             font-weight: 700;
             display: flex;
             align-items: center;
             gap: 0.75rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .header-actions {
@@ -51,122 +54,298 @@
         }
 
         .btn {
-            padding: 0.75rem 1.5rem;
+            padding: 0.875rem 1.75rem;
             border: none;
-            border-radius: 0.5rem;
+            border-radius: 0.75rem;
             font-size: 1rem;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
             text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
         }
 
         .btn-primary {
-            background: #3b82f6;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
             color: #ffffff;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
         }
 
         .btn-primary:hover {
-            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.6);
         }
 
         .btn-secondary {
-            background: #f1f5f9;
+            background: rgba(255, 255, 255, 0.9);
             color: #475569;
-            border: 1px solid #cbd5e1;
+            border: 1px solid rgba(203, 213, 225, 0.5);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
         .btn-secondary:hover {
-            background: #e2e8f0;
+            transform: translateY(-2px);
+            background: #ffffff;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.6);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.6);
         }
 
         .games-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
             margin-bottom: 2rem;
         }
 
         .game-card {
-            background: #ffffff;
-            border-radius: 1rem;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            padding: 1.5rem;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .game-card:hover::before {
+            transform: scaleX(1);
         }
 
         .game-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .game-card.completed {
+            opacity: 0.7;
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .game-card.completed::before {
+            background: linear-gradient(90deg, #10b981, #059669);
+            transform: scaleX(1);
         }
 
         .game-card h3 {
             color: #1e293b;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .game-card.completed h3::after {
+            content: '✓';
+            color: #10b981;
             font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
+            margin-left: auto;
+        }
+
+        .game-description {
+            color: #64748b;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
         }
 
         .game-stats {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
             gap: 1rem;
-            margin: 1rem 0;
+            margin: 1.5rem 0;
         }
 
         .stat {
             text-align: center;
-            flex: 1;
+            padding: 1rem;
+            background: rgba(248, 250, 252, 0.8);
+            border-radius: 1rem;
+            border: 1px solid rgba(226, 232, 240, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .stat:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px);
         }
 
         .stat-number {
             display: block;
-            font-size: 1.5rem;
-            font-weight: 700;
+            font-size: 2rem;
+            font-weight: 800;
             color: #3b82f6;
+            margin-bottom: 0.25rem;
+            text-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
         }
 
         .stat-label {
             font-size: 0.875rem;
             color: #64748b;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .game-categories {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: 1rem;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
         }
 
         .category-tag {
-            background: #e0e7ff;
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
             color: #3730a3;
-            padding: 0.25rem 0.75rem;
-            border-radius: 1rem;
-            font-size: 0.75rem;
-            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .category-tag:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .game-actions {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .game-card:hover .game-actions {
+            opacity: 1;
+        }
+
+        .action-btn {
+            width: 2.5rem;
+            height: 2.5rem;
+            border: none;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .action-btn.complete {
+            background: rgba(16, 185, 129, 0.9);
+            color: white;
+        }
+
+        .action-btn.complete:hover {
+            background: #10b981;
+            transform: scale(1.1);
+        }
+
+        .action-btn.delete {
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+        }
+
+        .action-btn.delete:hover {
+            background: #ef4444;
+            transform: scale(1.1);
         }
 
         .empty-state {
             text-align: center;
-            background: #ffffff;
-            border-radius: 1rem;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            padding: 3rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 4rem 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .empty-state i {
-            font-size: 4rem;
+            font-size: 5rem;
             color: #cbd5e1;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
         }
 
         .empty-state h3 {
             color: #64748b;
             margin-bottom: 1rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .empty-state p {
+            color: #94a3b8;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
         }
 
         .modal {
@@ -176,10 +355,17 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
             z-index: 1000;
             align-items: center;
             justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .modal.active {
@@ -187,67 +373,107 @@
         }
 
         .modal-content {
-            background: #ffffff;
-            border-radius: 1rem;
-            padding: 2rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 1.5rem;
+            padding: 2.5rem;
             max-width: 500px;
             width: 90%;
             max-height: 90vh;
             overflow-y: auto;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(226, 232, 240, 0.5);
         }
 
         .modal-header h2 {
             color: #1e293b;
-            font-size: 1.5rem;
-            font-weight: 600;
+            font-size: 1.75rem;
+            font-weight: 700;
         }
 
         .close-btn {
             background: none;
             border: none;
-            font-size: 1.5rem;
+            font-size: 1.75rem;
             cursor: pointer;
             color: #64748b;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            width: 3rem;
+            height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            background: rgba(241, 245, 249, 0.8);
+            color: #1e293b;
+            transform: rotate(90deg);
         }
 
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
             color: #374151;
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 1rem;
         }
 
         .form-group input,
         .form-group textarea,
         .form-group select {
             width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.5rem;
+            padding: 1rem;
+            border: 2px solid rgba(203, 213, 225, 0.5);
+            border-radius: 0.75rem;
             font-size: 1rem;
             font-family: inherit;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            background: #ffffff;
         }
 
         .form-group textarea {
             resize: vertical;
-            min-height: 100px;
+            min-height: 120px;
         }
 
         .form-actions {
             display: flex;
             gap: 1rem;
             justify-content: flex-end;
+            margin-top: 2.5rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid rgba(226, 232, 240, 0.5);
         }
 
         .members-list {
@@ -258,38 +484,123 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.75rem;
-            background: #f8fafc;
-            border-radius: 0.5rem;
-            margin-bottom: 0.5rem;
+            padding: 1rem;
+            background: rgba(248, 250, 252, 0.8);
+            border-radius: 0.75rem;
+            margin-bottom: 0.75rem;
+            border: 1px solid rgba(226, 232, 240, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .member-item:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateX(5px);
         }
 
         .member-info {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 1rem;
         }
 
         .member-avatar {
-            width: 2rem;
-            height: 2rem;
-            background: #3b82f6;
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #ffffff;
-            font-weight: 600;
+            font-weight: 700;
+            font-size: 1rem;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
 
         .remove-member {
-            background: #ef4444;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
             color: #ffffff;
             border: none;
-            border-radius: 0.25rem;
-            padding: 0.25rem 0.5rem;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
             cursor: pointer;
-            font-size: 0.75rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .remove-member:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
+
+        .notification {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            color: white;
+            font-weight: 600;
+            z-index: 10000;
+            animation: slideInRight 0.3s ease;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                padding: 1rem;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 1.5rem;
+                text-align: center;
+            }
+
+            .header h1 {
+                font-size: 1.75rem;
+            }
+
+            .games-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .game-stats {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.75rem;
+            }
+
+            .stat {
+                padding: 0.75rem;
+            }
+
+            .stat-number {
+                font-size: 1.5rem;
+            }
+
+            .modal-content {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -380,11 +691,34 @@
         </div>
     </div>
 
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteGameModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Delete Game</h2>
+                <button class="close-btn" onclick="closeModal('deleteGameModal')">&times;</button>
+            </div>
+            <div style="padding: 1rem 0;">
+                <p style="color: #64748b; margin-bottom: 1.5rem; line-height: 1.6;">
+                    Are you sure you want to delete "<span id="deleteGameName" style="font-weight: 600; color: #1e293b;"></span>"? 
+                    This action cannot be undone and will permanently remove all associated tasks.
+                </p>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('deleteGameModal')">Cancel</button>
+                <button type="button" class="btn btn-danger" onclick="gameManager.confirmDeleteGame()">
+                    <i class="fas fa-trash"></i> Delete Game
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         class GameManager {
             constructor() {
                 this.games = this.loadGames();
                 this.members = this.loadMembers();
+                this.gameToDelete = null;
                 this.init();
             }
 
@@ -418,6 +752,7 @@
                     name: gameData.name,
                     description: gameData.description,
                     genre: gameData.genre,
+                    completed: false,
                     createdAt: new Date().toISOString(),
                     updatedAt: new Date().toISOString(),
                     issues: {
@@ -432,6 +767,7 @@
                 this.saveGames();
                 this.renderGames();
                 this.updateEmptyState();
+                this.showNotification('Game created successfully!', 'success');
             }
 
             addMember(memberData) {
@@ -445,6 +781,42 @@
 
                 this.members.push(member);
                 this.saveMembers();
+                this.showNotification('Team member added successfully!', 'success');
+            }
+
+            toggleGameComplete(gameId) {
+                const game = this.games.find(g => g.id === gameId);
+                if (game) {
+                    game.completed = !game.completed;
+                    game.updatedAt = new Date().toISOString();
+                    this.saveGames();
+                    this.renderGames();
+                    this.showNotification(
+                        game.completed ? 'Game marked as completed!' : 'Game marked as active!', 
+                        'success'
+                    );
+                }
+            }
+
+            deleteGame(gameId) {
+                this.gameToDelete = gameId;
+                const game = this.games.find(g => g.id === gameId);
+                if (game) {
+                    document.getElementById('deleteGameName').textContent = game.name;
+                    document.getElementById('deleteGameModal').classList.add('active');
+                }
+            }
+
+            confirmDeleteGame() {
+                if (this.gameToDelete) {
+                    this.games = this.games.filter(g => g.id !== this.gameToDelete);
+                    this.saveGames();
+                    this.renderGames();
+                    this.updateEmptyState();
+                    this.closeModal('deleteGameModal');
+                    this.showNotification('Game deleted successfully!', 'success');
+                    this.gameToDelete = null;
+                }
             }
 
             getGameStats(gameId) {
@@ -478,9 +850,21 @@
                         ${this.games.map(game => {
                             const stats = this.getGameStats(game.id);
                             return `
-                                <div class="game-card" onclick="gameManager.openGame('${game.id}')">
+                                <div class="game-card ${game.completed ? 'completed' : ''}" onclick="gameManager.openGame('${game.id}')">
+                                    <div class="game-actions">
+                                        <button class="action-btn ${game.completed ? 'complete' : 'complete'}" 
+                                                onclick="event.stopPropagation(); gameManager.toggleGameComplete('${game.id}')"
+                                                title="${game.completed ? 'Mark as Active' : 'Mark as Complete'}">
+                                            <i class="fas ${game.completed ? 'fa-undo' : 'fa-check'}"></i>
+                                        </button>
+                                        <button class="action-btn delete" 
+                                                onclick="event.stopPropagation(); gameManager.deleteGame('${game.id}')"
+                                                title="Delete Game">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
                                     <h3>${game.name}</h3>
-                                    <p style="color: #64748b; margin-bottom: 1rem;">${game.description || 'No description'}</p>
+                                    <p class="game-description">${game.description || 'No description'}</p>
                                     
                                     <div class="game-stats">
                                         <div class="stat">
@@ -523,9 +907,19 @@
             }
 
             openGame(gameId) {
-                // Store the current game ID and redirect to the game review page
                 localStorage.setItem('currentGameId', gameId);
                 window.location.href = 'game-design-review.html';
+            }
+
+            showNotification(message, type = 'success') {
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.textContent = message;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
             }
 
             setupEventListeners() {
@@ -554,7 +948,7 @@
                     };
                     
                     this.addGame(formData);
-                    closeModal('addGameModal');
+                    this.closeModal('addGameModal');
                     document.getElementById('addGameForm').reset();
                 });
 
@@ -568,15 +962,19 @@
                     };
                     
                     this.addMember(formData);
-                    closeModal('addMemberModal');
+                    this.closeModal('addMemberModal');
                     document.getElementById('addMemberForm').reset();
                 });
+            }
+
+            closeModal(modalId) {
+                document.getElementById(modalId).classList.remove('active');
             }
         }
 
         // Global functions
         function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
+            gameManager.closeModal(modalId);
         }
 
         // Initialize the game manager

@@ -10,6 +10,7 @@ class GameDesignReview {
             priority: 'all',
             assignee: 'all'
         };
+        this.currentTask = null;
         
         this.init();
     }
@@ -86,6 +87,7 @@ class GameDesignReview {
         this.saveData();
         this.renderIssues();
         this.updateStatistics();
+        this.showNotification('Task created successfully!', 'success');
     }
 
     updateTask(taskId, updates) {
@@ -118,6 +120,29 @@ class GameDesignReview {
         this.saveData();
         this.renderIssues();
         this.updateStatistics();
+        this.showNotification('Task deleted successfully!', 'success');
+    }
+
+    toggleTaskComplete(taskId) {
+        if (!this.currentGame) return;
+
+        // Find the task in any category
+        for (const category in this.currentGame.issues) {
+            const task = this.currentGame.issues[category].find(t => t.id === taskId);
+            if (task) {
+                task.status = task.status === 'completed' ? 'open' : 'completed';
+                task.updatedAt = new Date().toISOString();
+                break;
+            }
+        }
+
+        this.saveData();
+        this.renderIssues();
+        this.updateStatistics();
+        this.showNotification(
+            this.currentTask.status === 'completed' ? 'Task marked as completed!' : 'Task reopened!', 
+            'success'
+        );
     }
 
     // Issue Rendering
@@ -190,7 +215,7 @@ class GameDesignReview {
         const assigneeInitials = assignee ? assignee.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'U';
 
         return `
-            <div class="issue-card" onclick="gameReview.openTaskDetail('${task.id}')">
+            <div class="issue-card ${task.status === 'completed' ? 'completed' : ''}" onclick="gameReview.openTaskDetail('${task.id}')">
                 <div class="issue-header">
                     <div>
                         <div class="issue-title">${task.title}</div>
@@ -221,6 +246,7 @@ class GameDesignReview {
         const task = this.findTask(taskId);
         if (!task) return;
 
+        this.currentTask = task;
         const assignee = this.members.find(m => m.id === task.assignee);
         const assigneeName = assignee ? assignee.name : 'Unassigned';
 
@@ -279,6 +305,19 @@ class GameDesignReview {
         `;
 
         document.getElementById('taskDetailContent').innerHTML = content;
+        
+        // Show/hide action buttons based on task status
+        const completeBtn = document.getElementById('completeTaskBtn');
+        const reopenBtn = document.getElementById('reopenTaskBtn');
+        
+        if (task.status === 'completed') {
+            completeBtn.style.display = 'none';
+            reopenBtn.style.display = 'inline-flex';
+        } else {
+            completeBtn.style.display = 'inline-flex';
+            reopenBtn.style.display = 'none';
+        }
+        
         document.getElementById('taskDetailModal').classList.add('active');
     }
 
@@ -309,13 +348,21 @@ class GameDesignReview {
     // Filters
     populateFilters() {
         const assigneeFilter = document.getElementById('assigneeFilter');
+        const taskAssignee = document.getElementById('taskAssignee');
+        
         assigneeFilter.innerHTML = '<option value="all">All Assignees</option>';
+        taskAssignee.innerHTML = '<option value="">Unassigned</option>';
         
         this.members.forEach(member => {
-            const option = document.createElement('option');
-            option.value = member.id;
-            option.textContent = member.name;
-            assigneeFilter.appendChild(option);
+            const option1 = document.createElement('option');
+            option1.value = member.id;
+            option1.textContent = member.name;
+            assigneeFilter.appendChild(option1);
+
+            const option2 = document.createElement('option');
+            option2.value = member.id;
+            option2.textContent = member.name;
+            taskAssignee.appendChild(option2);
         });
     }
 
@@ -378,6 +425,28 @@ class GameDesignReview {
         // Task category change
         document.getElementById('taskCategory').addEventListener('change', (e) => {
             this.updateTaskFormFields(e.target.value);
+        });
+
+        // Task action buttons
+        document.getElementById('completeTaskBtn').addEventListener('click', () => {
+            if (this.currentTask) {
+                this.toggleTaskComplete(this.currentTask.id);
+                this.closeModal('taskDetailModal');
+            }
+        });
+
+        document.getElementById('reopenTaskBtn').addEventListener('click', () => {
+            if (this.currentTask) {
+                this.toggleTaskComplete(this.currentTask.id);
+                this.closeModal('taskDetailModal');
+            }
+        });
+
+        document.getElementById('deleteTaskBtn').addEventListener('click', () => {
+            if (this.currentTask) {
+                this.closeModal('taskDetailModal');
+                document.getElementById('deleteTaskModal').classList.add('active');
+            }
         });
 
         // Close modals when clicking outside
@@ -445,6 +514,25 @@ class GameDesignReview {
                 task.style.display = 'none';
             }
         });
+    }
+
+    confirmDeleteTask() {
+        if (this.currentTask) {
+            this.deleteTask(this.currentTask.id);
+            this.closeModal('deleteTaskModal');
+            this.currentTask = null;
+        }
+    }
+
+    showNotification(message, type = 'success') {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
     }
 
     // Utility functions
