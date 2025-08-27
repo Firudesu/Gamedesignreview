@@ -108,7 +108,7 @@ class TaskManager {
 
         // Task action buttons
         document.getElementById('markCompleteBtn').addEventListener('click', () => {
-            this.toggleTaskComplete();
+            this.showCompletionModal();
         });
 
         document.getElementById('reopenTaskBtn').addEventListener('click', () => {
@@ -117,6 +117,18 @@ class TaskManager {
 
         document.getElementById('deleteTaskBtn').addEventListener('click', () => {
             this.deleteTask();
+        });
+
+        // Completion modal form
+        document.getElementById('completionForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.completeTaskWithComment();
+        });
+
+        // Comment modal form
+        document.getElementById('commentForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.addComment();
         });
 
         // Close modals when clicking outside
@@ -188,7 +200,9 @@ class TaskManager {
                 assignee: formData.category === 'review' ? null : formData.assignee,
                 status: 'open',
                 createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
+                updatedAt: new Date().toISOString(),
+                comments: [],
+                completionComment: null
             };
 
             // Add task to current game
@@ -281,6 +295,7 @@ class TaskManager {
         const priorityClass = task.priority ? `task-priority ${task.priority}` : '';
         const priorityText = task.priority ? task.priority.toUpperCase() : '';
         const assigneeName = task.assignee ? this.members.find(m => m.id === task.assignee)?.name : null;
+        const commentCount = task.comments ? task.comments.length : 0;
         
         return `
             <div class="task-card ${task.status === 'completed' ? 'completed' : ''}" onclick="taskManager.openTaskDetail('${task.id}')">
@@ -290,23 +305,127 @@ class TaskManager {
                 <div class="task-meta">
                     ${priorityText ? `<span class="${priorityClass}">${priorityText}</span>` : ''}
                     ${assigneeName ? `<span class="task-assignee">Assigned to ${this.escapeHtml(assigneeName)}</span>` : ''}
+                    ${commentCount > 0 ? `<span class="task-comments"><i class="fas fa-comments"></i> ${commentCount}</span>` : ''}
                 </div>
                 <div class="task-description">${this.escapeHtml(task.description || 'No description')}</div>
                 <div class="task-actions">
                     ${task.status === 'open' ? 
-                        `<button class="task-btn complete" onclick="event.stopPropagation(); taskManager.toggleTaskComplete('${task.id}')">
+                        `<button class="task-btn complete" onclick="event.stopPropagation(); taskManager.showCompletionModal('${task.id}')">
                             <i class="fas fa-check"></i> Complete
                         </button>` :
                         `<button class="task-btn reopen" onclick="event.stopPropagation(); taskManager.toggleTaskComplete('${task.id}')">
                             <i class="fas fa-undo"></i> Reopen
                         </button>`
                     }
+                    <button class="task-btn comment" onclick="event.stopPropagation(); taskManager.showCommentModal('${task.id}')">
+                        <i class="fas fa-comment"></i> Comment
+                    </button>
                     <button class="task-btn delete" onclick="event.stopPropagation(); taskManager.deleteTask('${task.id}')">
                         <i class="fas fa-trash"></i> Delete
                     </button>
                 </div>
             </div>
         `;
+    }
+
+    showCompletionModal(taskId) {
+        this.currentTaskId = taskId;
+        this.showModal('completionModal');
+    }
+
+    async completeTaskWithComment() {
+        const comment = document.getElementById('completionComment').value.trim();
+        
+        try {
+            // Find the task in the current game
+            let task = null;
+            let category = null;
+            
+            for (const [cat, tasks] of Object.entries(this.currentGame.issues || {})) {
+                const foundTask = tasks.find(t => t.id === this.currentTaskId);
+                if (foundTask) {
+                    task = foundTask;
+                    category = cat;
+                    break;
+                }
+            }
+            
+            if (task) {
+                task.status = 'completed';
+                task.updatedAt = new Date().toISOString();
+                task.completionComment = comment;
+                
+                // Save to GitHub
+                await this.saveData();
+                
+                // Update UI
+                this.renderTasks();
+                this.updateStatistics();
+                this.hideModal('completionModal');
+                document.getElementById('completionComment').value = '';
+                
+                this.showNotification('Task completed successfully!', 'success');
+            }
+        } catch (error) {
+            console.error('Error completing task:', error);
+            this.showNotification('Error completing task. Please try again.', 'error');
+        }
+    }
+
+    showCommentModal(taskId) {
+        this.currentTaskId = taskId;
+        this.showModal('commentModal');
+    }
+
+    async addComment() {
+        const commentText = document.getElementById('commentText').value.trim();
+        
+        if (!commentText) {
+            this.showNotification('Please enter a comment.', 'error');
+            return;
+        }
+        
+        try {
+            // Find the task in the current game
+            let task = null;
+            
+            for (const tasks of Object.values(this.currentGame.issues || {})) {
+                const foundTask = tasks.find(t => t.id === this.currentTaskId);
+                if (foundTask) {
+                    task = foundTask;
+                    break;
+                }
+            }
+            
+            if (task) {
+                if (!task.comments) {
+                    task.comments = [];
+                }
+                
+                const comment = {
+                    id: Date.now().toString(),
+                    text: commentText,
+                    createdAt: new Date().toISOString(),
+                    status: 'open' // open, resolved, closed
+                };
+                
+                task.comments.push(comment);
+                task.updatedAt = new Date().toISOString();
+                
+                // Save to GitHub
+                await this.saveData();
+                
+                // Update UI
+                this.renderTasks();
+                this.hideModal('commentModal');
+                document.getElementById('commentText').value = '';
+                
+                this.showNotification('Comment added successfully!', 'success');
+            }
+        } catch (error) {
+            console.error('Error adding comment:', error);
+            this.showNotification('Error adding comment. Please try again.', 'error');
+        }
     }
 
     async toggleTaskComplete(taskId) {
@@ -367,6 +486,21 @@ class TaskManager {
                 task.assignee ? this.members.find(m => m.id === task.assignee)?.name || 'Unknown' : 'Unassigned';
             document.getElementById('detailTaskDescription').textContent = task.description || 'No description';
             
+            // Show completion comment if exists
+            const completionCommentDiv = document.getElementById('detailCompletionComment');
+            if (task.completionComment) {
+                completionCommentDiv.style.display = 'block';
+                completionCommentDiv.innerHTML = `
+                    <h4>Completion Notes:</h4>
+                    <p>${this.escapeHtml(task.completionComment)}</p>
+                `;
+            } else {
+                completionCommentDiv.style.display = 'none';
+            }
+            
+            // Render comments
+            this.renderComments(task);
+            
             // Show/hide action buttons based on task status
             const markCompleteBtn = document.getElementById('markCompleteBtn');
             const reopenTaskBtn = document.getElementById('reopenTaskBtn');
@@ -383,6 +517,80 @@ class TaskManager {
             this.currentTaskId = taskId;
             
             this.showModal('taskDetailModal');
+        }
+    }
+
+    renderComments(task) {
+        const commentsContainer = document.getElementById('taskComments');
+        
+        if (!task.comments || task.comments.length === 0) {
+            commentsContainer.innerHTML = '<p class="no-comments">No comments yet</p>';
+            return;
+        }
+        
+        const commentsHtml = task.comments.map(comment => `
+            <div class="comment-item ${comment.status}">
+                <div class="comment-header">
+                    <span class="comment-date">${new Date(comment.createdAt).toLocaleDateString()}</span>
+                    <span class="comment-status ${comment.status}">${comment.status}</span>
+                </div>
+                <div class="comment-text">${this.escapeHtml(comment.text)}</div>
+                ${comment.status === 'open' ? `
+                    <div class="comment-actions">
+                        <button class="btn btn-sm btn-success" onclick="taskManager.resolveComment('${task.id}', '${comment.id}')">
+                            <i class="fas fa-check"></i> Resolve
+                        </button>
+                        <button class="btn btn-sm btn-secondary" onclick="taskManager.closeComment('${task.id}', '${comment.id}')">
+                            <i class="fas fa-times"></i> Close
+                        </button>
+                    </div>
+                ` : ''}
+            </div>
+        `).join('');
+        
+        commentsContainer.innerHTML = commentsHtml;
+    }
+
+    async resolveComment(taskId, commentId) {
+        await this.updateCommentStatus(taskId, commentId, 'resolved');
+    }
+
+    async closeComment(taskId, commentId) {
+        await this.updateCommentStatus(taskId, commentId, 'closed');
+    }
+
+    async updateCommentStatus(taskId, commentId, status) {
+        try {
+            // Find the task and comment
+            let task = null;
+            
+            for (const tasks of Object.values(this.currentGame.issues || {})) {
+                const foundTask = tasks.find(t => t.id === taskId);
+                if (foundTask) {
+                    task = foundTask;
+                    break;
+                }
+            }
+            
+            if (task && task.comments) {
+                const comment = task.comments.find(c => c.id === commentId);
+                if (comment) {
+                    comment.status = status;
+                    task.updatedAt = new Date().toISOString();
+                    
+                    // Save to GitHub
+                    await this.saveData();
+                    
+                    // Update UI
+                    this.renderComments(task);
+                    this.renderTasks();
+                    
+                    this.showNotification(`Comment ${status} successfully!`, 'success');
+                }
+            }
+        } catch (error) {
+            console.error('Error updating comment status:', error);
+            this.showNotification('Error updating comment. Please try again.', 'error');
         }
     }
 

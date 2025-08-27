@@ -198,6 +198,34 @@
             color: white;
         }
 
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(248, 250, 252, 0.8);
+            border-radius: 0.75rem;
+            border: 1px solid rgba(226, 232, 240, 0.5);
+        }
+
+        .stat-number {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
         .main-area {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -368,6 +396,23 @@
             background: #dc2626;
         }
 
+        .task-btn.comment {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .task-btn.comment:hover {
+            background: #7c3aed;
+        }
+
+        .task-comments {
+            color: #8b5cf6;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -494,6 +539,120 @@
             margin-top: 2.5rem;
             padding-top: 1.5rem;
             border-top: 2px solid rgba(226, 232, 240, 0.5);
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        .comment-section {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid rgba(226, 232, 240, 0.5);
+        }
+
+        .comment-section h3 {
+            color: #1e293b;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .comment-item {
+            background: rgba(248, 250, 252, 0.8);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(226, 232, 240, 0.5);
+        }
+
+        .comment-item.resolved {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .comment-item.closed {
+            background: rgba(107, 114, 128, 0.1);
+            border-color: rgba(107, 114, 128, 0.3);
+            opacity: 0.7;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .comment-date {
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        .comment-status {
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .comment-status.open {
+            background: rgba(59, 130, 246, 0.1);
+            color: #2563eb;
+        }
+
+        .comment-status.resolved {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+        }
+
+        .comment-status.closed {
+            background: rgba(107, 114, 128, 0.1);
+            color: #6b7280;
+        }
+
+        .comment-text {
+            color: #374151;
+            line-height: 1.5;
+            margin-bottom: 0.75rem;
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
+        }
+
+        .no-comments {
+            color: #94a3b8;
+            font-style: italic;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .completion-notes {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .completion-notes h4 {
+            color: #059669;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .completion-notes p {
+            color: #065f46;
+            line-height: 1.5;
         }
 
         .notification {
@@ -720,7 +879,7 @@
 
     <!-- Task Detail Modal -->
     <div id="taskDetailModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 700px;">
             <div class="modal-header">
                 <h2 id="detailTaskTitle">Task Title</h2>
                 <button class="close-btn" onclick="closeModal('taskDetailModal')">&times;</button>
@@ -735,6 +894,17 @@
                         </div>
                         <div class="task-description" id="detailTaskDescription">
                             Task description will appear here...
+                        </div>
+                        <div id="detailCompletionComment" class="completion-notes" style="display: none;">
+                            <!-- Completion notes will be populated here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Comments Section -->
+                    <div class="comment-section">
+                        <h3><i class="fas fa-comments"></i> Comments</h3>
+                        <div id="taskComments">
+                            <!-- Comments will be populated here -->
                         </div>
                     </div>
                 </div>
@@ -751,6 +921,50 @@
                     <i class="fas fa-trash"></i> Delete Task
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- Completion Modal -->
+    <div id="completionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Complete Task</h2>
+                <button class="close-btn" onclick="closeModal('completionModal')">&times;</button>
+            </div>
+            <form id="completionForm">
+                <div class="form-group">
+                    <label for="completionComment">Completion Notes (Optional)</label>
+                    <textarea id="completionComment" placeholder="Describe what was fixed or completed..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('completionModal')">Cancel</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-check"></i> Complete Task
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Comment Modal -->
+    <div id="commentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add Comment</h2>
+                <button class="close-btn" onclick="closeModal('commentModal')">&times;</button>
+            </div>
+            <form id="commentForm">
+                <div class="form-group">
+                    <label for="commentText">Comment</label>
+                    <textarea id="commentText" placeholder="Add a comment for clarification or additional information..." required></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('commentModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-comment"></i> Add Comment
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
