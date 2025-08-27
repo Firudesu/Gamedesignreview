@@ -1,62 +1,17 @@
 [
   {
-    "id": "1756123485512",
+    "id": "1756287784204",
     "name": "Test",
-    "description": "test",
-    "genre": "test",
+    "description": "",
+    "genre": "",
     "completed": false,
-    "createdAt": "2025-08-25T12:04:45.512Z",
-    "updatedAt": "2025-08-25T12:04:45.512Z",
+    "createdAt": "2025-08-27T09:43:04.204Z",
+    "updatedAt": "2025-08-27T09:43:04.204Z",
     "issues": {
-      "bug": [
-        {
-          "id": "1756287076970",
-          "title": "Movement issue",
-          "description": "",
-          "category": "bug",
-          "priority": "medium",
-          "urgency": "medium",
-          "assignee": "",
-          "status": "open",
-          "createdAt": "2025-08-27T09:31:16.970Z",
-          "updatedAt": "2025-08-27T09:31:16.970Z",
-          "comments": [],
-          "completionComment": null,
-          "completedBy": null
-        },
-        {
-          "id": "1756287711252",
-          "title": "Movement issue",
-          "description": "",
-          "category": "bug",
-          "priority": "medium",
-          "urgency": "medium",
-          "assignee": "",
-          "status": "open",
-          "createdAt": "2025-08-27T09:41:51.252Z",
-          "updatedAt": "2025-08-27T09:41:51.252Z",
-          "comments": [],
-          "completionComment": null,
-          "completedBy": null
-        }
-      ],
-      "controls": [
-        {
-          "id": "1756123508143",
-          "title": "Movement issue",
-          "description": "test",
-          "category": "controls",
-          "priority": "low",
-          "urgency": "high",
-          "assignee": "1756123446705",
-          "status": "open",
-          "createdAt": "2025-08-25T12:05:08.143Z",
-          "updatedAt": "2025-08-25T12:05:08.143Z"
-        }
-      ],
+      "bug": [],
+      "controls": [],
       "quest": [],
       "review": []
-    },
-    "deletedTasks": []
+    }
   }
 ]
