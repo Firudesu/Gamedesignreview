@@ -154,48 +154,59 @@ class TaskManager {
             this.showDeletedTasks();
         });
 
-        // Close modals when clicking outside
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal')) {
-                this.hideModal(e.target.id);
-            }
-        });
+                 // Close modals when clicking outside
+         document.addEventListener('click', (e) => {
+             if (e.target.classList.contains('modal')) {
+                 this.hideModal(e.target.id);
+             }
+             if (e.target.classList.contains('media-modal')) {
+                 this.closeMediaModal();
+             }
+         });
 
-        // Event delegation for dynamically created task elements
-        document.addEventListener('click', (e) => {
-            // Task expansion
-            if (e.target.closest('.task-summary')) {
-                const taskCard = e.target.closest('.task-card');
-                const taskId = taskCard.dataset.taskId;
-                this.toggleTaskExpansion(taskId);
-            }
-            
-            // Task action buttons
-            if (e.target.closest('.task-btn')) {
-                const button = e.target.closest('.task-btn');
-                const taskCard = button.closest('.task-card');
-                const taskId = taskCard.dataset.taskId;
-                
-                if (button.classList.contains('complete')) {
-                    this.showCompletionModal(taskId);
-                } else if (button.classList.contains('comment')) {
-                    this.showCommentModal(taskId);
-                } else if (button.classList.contains('delete')) {
-                    this.showDeleteModal(taskId);
-                } else if (button.classList.contains('reopen')) {
-                    this.toggleTaskComplete(taskId);
-                }
-            }
-            
-            // Remove team member button
-            if (e.target.closest('.btn-remove-member')) {
-                const button = e.target.closest('.btn-remove-member');
-                const memberId = button.dataset.memberId;
-                if (memberId) {
-                    this.removeTeamMember(memberId);
-                }
-            }
-        });
+                 // Event delegation for dynamically created task elements
+         document.addEventListener('click', (e) => {
+             // Task expansion
+             if (e.target.closest('.task-summary')) {
+                 const taskCard = e.target.closest('.task-card');
+                 const taskId = taskCard.dataset.taskId;
+                 this.toggleTaskExpansion(taskId);
+             }
+             
+             // Task action buttons
+             if (e.target.closest('.task-btn')) {
+                 const button = e.target.closest('.task-btn');
+                 const taskCard = button.closest('.task-card');
+                 const taskId = taskCard.dataset.taskId;
+                 
+                 if (button.classList.contains('complete')) {
+                     this.showCompletionModal(taskId);
+                 } else if (button.classList.contains('comment')) {
+                     this.showCommentModal(taskId);
+                 } else if (button.classList.contains('delete')) {
+                     this.showDeleteModal(taskId);
+                 } else if (button.classList.contains('reopen')) {
+                     this.toggleTaskComplete(taskId);
+                 }
+             }
+             
+             // Media item clicks
+             if (e.target.closest('.media-item')) {
+                 const mediaItem = e.target.closest('.media-item');
+                 const mediaUrl = mediaItem.dataset.mediaUrl;
+                 const mediaType = mediaItem.dataset.mediaType;
+                 this.showMediaModal(mediaUrl, mediaType);
+             }
+             
+             // Remove team member button
+             if (e.target.closest('.btn-remove-member')) {
+                 const button = e.target.closest('.btn-remove-member');
+                 const memberId = button.dataset.memberId;
+                 if (memberId) {
+                     this.removeTeamMember(memberId);
+                 }
+             }
+         });
     }
 
     setCurrentCategory(category) {
@@ -239,31 +250,36 @@ class TaskManager {
     }
 
     async createTask() {
-        const formData = {
-            title: document.getElementById('taskTitle').value,
-            description: document.getElementById('taskDescription').value,
-            category: document.getElementById('taskCategory').value,
-            priority: document.getElementById('taskPriority').value,
-            urgency: document.getElementById('taskUrgency').value,
-            assignee: document.getElementById('taskAssignee').value
-        };
+                 const formData = {
+             title: document.getElementById('taskTitle').value,
+             description: document.getElementById('taskDescription').value,
+             category: document.getElementById('taskCategory').value,
+             priority: document.getElementById('taskPriority').value,
+             urgency: document.getElementById('taskUrgency').value,
+             assignee: document.getElementById('taskAssignee').value,
+             mediaLinks: document.getElementById('taskMediaLinks').value
+         };
 
         try {
-            const task = {
-                id: Date.now().toString(),
-                title: formData.title,
-                description: formData.description,
-                category: formData.category,
-                priority: formData.category === 'review' ? null : formData.priority,
-                urgency: formData.category === 'review' ? null : formData.urgency,
-                assignee: formData.category === 'review' ? null : formData.assignee,
-                status: 'open',
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-                comments: [],
-                completionComment: null,
-                completedBy: null
-            };
+                         // Parse media links
+             const mediaLinks = this.parseMediaLinks(formData.mediaLinks);
+             
+             const task = {
+                 id: Date.now().toString(),
+                 title: formData.title,
+                 description: formData.description,
+                 category: formData.category,
+                 priority: formData.category === 'review' ? null : formData.priority,
+                 urgency: formData.category === 'review' ? null : formData.urgency,
+                 assignee: formData.category === 'review' ? null : formData.assignee,
+                 status: 'open',
+                 createdAt: new Date().toISOString(),
+                 updatedAt: new Date().toISOString(),
+                 comments: [],
+                 completionComment: null,
+                 completedBy: null,
+                 mediaLinks: mediaLinks
+             };
 
             // Add task to current game
             if (!this.currentGame.issues) {
@@ -351,12 +367,13 @@ class TaskManager {
         }
     }
 
-    renderTaskCard(task) {
-        const priorityClass = task.priority ? `task-priority ${task.priority}` : '';
-        const priorityText = task.priority ? task.priority.toUpperCase() : '';
-        const assigneeName = task.assignee ? this.members.find(m => m.id === task.assignee)?.name : null;
-        const commentCount = task.comments ? task.comments.length : 0;
-        const isExpanded = task.isExpanded || false;
+         renderTaskCard(task) {
+         const priorityClass = task.priority ? `task-priority ${task.priority}` : '';
+         const priorityText = task.priority ? task.priority.toUpperCase() : '';
+         const assigneeName = task.assignee ? this.members.find(m => m.id === task.assignee)?.name : null;
+         const commentCount = task.comments ? task.comments.length : 0;
+         const isExpanded = task.isExpanded || false;
+         const mediaThumbnails = this.renderMediaThumbnails(task.mediaLinks);
         
         return `
             <div class="task-card ${task.status === 'completed' ? 'completed' : ''}" data-task-id="${task.id}">
@@ -368,12 +385,13 @@ class TaskManager {
                             ${task.status === 'completed' ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-circle"></i>'}
                         </div>
                     </div>
-                    <div class="task-meta">
-                        ${priorityText ? `<span class="${priorityClass}">${priorityText}</span>` : ''}
-                        ${assigneeName ? `<span class="task-assignee">Assigned to ${this.escapeHtml(assigneeName)}</span>` : ''}
-                        ${commentCount > 0 ? `<span class="task-comments"><i class="fas fa-comments"></i> ${commentCount}</span>` : ''}
-                        <span class="task-date">${new Date(task.createdAt).toLocaleDateString()}</span>
-                    </div>
+                                         <div class="task-meta">
+                         ${priorityText ? `<span class="${priorityClass}">${priorityText}</span>` : ''}
+                         ${assigneeName ? `<span class="task-assignee">Assigned to ${this.escapeHtml(assigneeName)}</span>` : ''}
+                         ${commentCount > 0 ? `<span class="task-comments"><i class="fas fa-comments"></i> ${commentCount}</span>` : ''}
+                         ${mediaThumbnails}
+                         <span class="task-date">${new Date(task.createdAt).toLocaleDateString()}</span>
+                     </div>
                     <div class="task-description-summary">
                         ${this.escapeHtml(task.description || 'No description').substring(0, 100)}${(task.description && task.description.length > 100) ? '...' : ''}
                     </div>
@@ -397,21 +415,23 @@ class TaskManager {
                         </div>
                     ` : ''}
                     
-                    ${task.comments && task.comments.length > 0 ? `
-                        <div class="task-comments-section">
-                            <h4>Comments (${task.comments.length}):</h4>
-                            ${task.comments.map(comment => `
-                                <div class="comment-item ${comment.status}">
-                                    <div class="comment-header">
-                                        <span class="comment-author">${this.escapeHtml(comment.author || 'Anonymous')}</span>
-                                        <span class="comment-date">${new Date(comment.createdAt).toLocaleDateString()}</span>
-                                        <span class="comment-status ${comment.status}">${comment.status}</span>
-                                    </div>
-                                    <div class="comment-text">${this.escapeHtml(comment.text)}</div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    ` : ''}
+                                         ${this.renderMediaSection(task.mediaLinks)}
+                     
+                     ${task.comments && task.comments.length > 0 ? `
+                         <div class="task-comments-section">
+                             <h4>Comments (${task.comments.length}):</h4>
+                             ${task.comments.map(comment => `
+                                 <div class="comment-item ${comment.status}">
+                                     <div class="comment-header">
+                                         <span class="comment-author">${this.escapeHtml(comment.author || 'Anonymous')}</span>
+                                         <span class="comment-date">${new Date(comment.createdAt).toLocaleDateString()}</span>
+                                         <span class="comment-status ${comment.status}">${comment.status}</span>
+                                     </div>
+                                     <div class="comment-text">${this.escapeHtml(comment.text)}</div>
+                                 </div>
+                             `).join('')}
+                         </div>
+                     ` : ''}
                     
                     <div class="task-actions">
                         ${task.status === 'open' ? 
@@ -894,19 +914,164 @@ class TaskManager {
         }, 3000);
     }
 
-    escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
+         parseMediaLinks(mediaLinksText) {
+         if (!mediaLinksText || !mediaLinksText.trim()) {
+             return [];
+         }
+         
+         const lines = mediaLinksText.trim().split('\n');
+         const mediaLinks = [];
+         
+         lines.forEach(line => {
+             const url = line.trim();
+             if (url) {
+                 const mediaType = this.getMediaType(url);
+                 if (mediaType) {
+                     mediaLinks.push({
+                         url: url,
+                         type: mediaType
+                     });
+                 }
+             }
+         });
+         
+         return mediaLinks;
+     }
+     
+     getMediaType(url) {
+         const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+         const lowerUrl = url.toLowerCase();
+         
+         // Check for image extensions
+         if (imageExtensions.some(ext => lowerUrl.includes(ext))) {
+             return 'image';
+         }
+         
+         // Check for YouTube videos
+         if (lowerUrl.includes('youtube.com/watch') || lowerUrl.includes('youtu.be/')) {
+             return 'video';
+         }
+         
+         return null;
+     }
+     
+     getYouTubeEmbedUrl(url) {
+         let videoId = '';
+         
+         if (url.includes('youtube.com/watch')) {
+             const urlParams = new URLSearchParams(url.split('?')[1]);
+             videoId = urlParams.get('v');
+         } else if (url.includes('youtu.be/')) {
+             videoId = url.split('youtu.be/')[1];
+         }
+         
+         return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+     }
+     
+     renderMediaSection(mediaLinks) {
+         if (!mediaLinks || mediaLinks.length === 0) {
+             return '';
+         }
+         
+         const mediaItems = mediaLinks.map(media => {
+             if (media.type === 'image') {
+                 return `
+                     <div class="media-item" data-media-url="${this.escapeHtml(media.url)}" data-media-type="image">
+                         <img src="${this.escapeHtml(media.url)}" alt="Task media" onerror="this.style.display='none'">
+                     </div>
+                 `;
+             } else if (media.type === 'video') {
+                 return `
+                     <div class="media-item video" data-media-url="${this.escapeHtml(media.url)}" data-media-type="video">
+                     </div>
+                 `;
+             }
+             return '';
+         }).join('');
+         
+         return `
+             <div class="task-media-section">
+                 <h4>Media (${mediaLinks.length})</h4>
+                 <div class="media-grid">
+                     ${mediaItems}
+                 </div>
+             </div>
+         `;
+     }
+     
+     renderMediaThumbnails(mediaLinks) {
+         if (!mediaLinks || mediaLinks.length === 0) {
+             return '';
+         }
+         
+         const imageCount = mediaLinks.filter(m => m.type === 'image').length;
+         const videoCount = mediaLinks.filter(m => m.type === 'video').length;
+         
+         let thumbnailHtml = '';
+         
+         // Show first image as thumbnail if available
+         const firstImage = mediaLinks.find(m => m.type === 'image');
+         if (firstImage) {
+             thumbnailHtml += `<img src="${this.escapeHtml(firstImage.url)}" class="media-thumbnail" alt="Media thumbnail">`;
+         }
+         
+         // Show count
+         if (imageCount > 0 || videoCount > 0) {
+             thumbnailHtml += `<span class="media-count">`;
+             if (imageCount > 0) {
+                 thumbnailHtml += `${imageCount} image${imageCount > 1 ? 's' : ''}`;
+             }
+             if (videoCount > 0) {
+                 if (imageCount > 0) thumbnailHtml += ', ';
+                 thumbnailHtml += `${videoCount} video${videoCount > 1 ? 's' : ''}`;
+             }
+             thumbnailHtml += `</span>`;
+         }
+         
+         return thumbnailHtml;
+     }
+     
+     showMediaModal(mediaUrl, mediaType) {
+         const modalContent = document.getElementById('mediaModalContent');
+         
+         if (mediaType === 'image') {
+             modalContent.innerHTML = `<img src="${this.escapeHtml(mediaUrl)}" alt="Full size image">`;
+         } else if (mediaType === 'video') {
+             const embedUrl = this.getYouTubeEmbedUrl(mediaUrl);
+             if (embedUrl) {
+                 modalContent.innerHTML = `<iframe src="${this.escapeHtml(embedUrl)}" allowfullscreen></iframe>`;
+             } else {
+                 modalContent.innerHTML = `<p style="color: white;">Invalid video URL</p>`;
+             }
+         }
+         
+         document.getElementById('mediaModal').classList.add('active');
+     }
+     
+     closeMediaModal() {
+         document.getElementById('mediaModal').classList.remove('active');
+         document.getElementById('mediaModalContent').innerHTML = '';
+     }
+
+     escapeHtml(text) {
+         const div = document.createElement('div');
+         div.textContent = text;
+         return div.innerHTML;
+     }
 }
 
-// Global functions
-function closeModal(modalId) {
-    if (window.taskManager) {
-        window.taskManager.hideModal(modalId);
-    }
-}
+ // Global functions
+ function closeModal(modalId) {
+     if (window.taskManager) {
+         window.taskManager.hideModal(modalId);
+     }
+ }
+ 
+ function closeMediaModal() {
+     if (window.taskManager) {
+         window.taskManager.closeMediaModal();
+     }
+ }
 
 // Initialize the application
 let taskManager;
