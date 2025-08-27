@@ -34,7 +34,29 @@
           "isExpanded": true
         }
       ],
-      "controls": [],
+      "controls": [
+        {
+          "id": "1756289668372",
+          "title": "test",
+          "description": "test",
+          "category": "controls",
+          "priority": "medium",
+          "urgency": "medium",
+          "assignee": "1756123446705",
+          "status": "open",
+          "createdAt": "2025-08-27T10:14:28.372Z",
+          "updatedAt": "2025-08-27T10:14:28.372Z",
+          "comments": [],
+          "completionComment": null,
+          "completedBy": null,
+          "mediaLinks": [
+            {
+              "url": "https://www.youtube.com/watch?v=N9ySFldKrbo&t=3858s",
+              "type": "video"
+            }
+          ]
+        }
+      ],
       "quest": [],
       "review": []
     },
