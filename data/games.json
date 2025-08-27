@@ -9,27 +9,30 @@
     "updatedAt": "2025-08-27T09:43:04.204Z",
     "issues": {
       "bug": [],
-      "controls": [
-        {
-          "id": "1756287796100",
-          "title": "Movement issue",
-          "description": "",
-          "category": "controls",
-          "priority": "medium",
-          "urgency": "medium",
-          "assignee": "",
-          "status": "open",
-          "createdAt": "2025-08-27T09:43:16.100Z",
-          "updatedAt": "2025-08-27T09:51:00.776Z",
-          "comments": [],
-          "completionComment": null,
-          "completedBy": null,
-          "isExpanded": true
-        }
-      ],
+      "controls": [],
       "quest": [],
       "review": []
     },
-    "deletedTasks": []
+    "deletedTasks": [
+      {
+        "id": "1756287796100",
+        "title": "Movement issue",
+        "description": "",
+        "category": "controls",
+        "priority": "medium",
+        "urgency": "medium",
+        "assignee": "",
+        "status": "open",
+        "createdAt": "2025-08-27T09:43:16.100Z",
+        "updatedAt": "2025-08-27T09:51:00.776Z",
+        "comments": [],
+        "completionComment": null,
+        "completedBy": null,
+        "isExpanded": true,
+        "deletedAt": "2025-08-27T09:51:10.468Z",
+        "deletedBy": "philip pardoe",
+        "deleteReason": "fixed"
+      }
+    ]
   }
 ]
