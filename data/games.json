@@ -9,9 +9,26 @@
     "updatedAt": "2025-08-27T09:43:04.204Z",
     "issues": {
       "bug": [],
-      "controls": [],
+      "controls": [
+        {
+          "id": "1756287796100",
+          "title": "Movement issue",
+          "description": "",
+          "category": "controls",
+          "priority": "medium",
+          "urgency": "medium",
+          "assignee": "",
+          "status": "open",
+          "createdAt": "2025-08-27T09:43:16.100Z",
+          "updatedAt": "2025-08-27T09:43:16.100Z",
+          "comments": [],
+          "completionComment": null,
+          "completedBy": null
+        }
+      ],
       "quest": [],
       "review": []
-    }
+    },
+    "deletedTasks": []
   }
 ]
