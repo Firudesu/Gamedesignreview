@@ -18,12 +18,12 @@
           "priority": "medium",
           "urgency": "medium",
           "assignee": "",
-          "status": "completed",
+          "status": "open",
           "createdAt": "2025-08-27T09:43:16.100Z",
-          "updatedAt": "2025-08-27T09:50:45.912Z",
+          "updatedAt": "2025-08-27T09:51:00.776Z",
           "comments": [],
-          "completionComment": "fixed",
-          "completedBy": "Philip Pardoe",
+          "completionComment": null,
+          "completedBy": null,
           "isExpanded": true
         }
       ],
