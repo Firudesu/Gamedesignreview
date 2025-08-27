@@ -394,6 +394,49 @@
             color: #1e293b;
         }
 
+        .team-member-item {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .team-member-info h4 {
+            color: #1e40af;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0 0 0.25rem 0;
+        }
+
+        .team-member-role {
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        .team-member-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-remove-member {
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-remove-member:hover {
+            background: #dc2626;
+        }
+
         .task-header {
             display: flex;
             justify-content: space-between;
@@ -913,6 +956,16 @@
                 </div>
 
                 <div class="sidebar-section">
+                    <h3><i class="fas fa-users"></i> Team Management</h3>
+                    <button class="btn btn-primary" onclick="taskManager.showAddMemberModal()" style="width: 100%; margin-bottom: 0.5rem;">
+                        <i class="fas fa-user-plus"></i> Add Team Member
+                    </button>
+                    <button class="btn btn-secondary" onclick="taskManager.showTeamMembers()" style="width: 100%;">
+                        <i class="fas fa-users"></i> View Team Members
+                    </button>
+                </div>
+
+                <div class="sidebar-section">
                     <h3><i class="fas fa-archive"></i> Deleted Tasks</h3>
                     <button class="btn btn-secondary" onclick="taskManager.showDeletedTasks()" style="width: 100%;">
                         <i class="fas fa-trash"></i> View Deleted Tasks
@@ -1008,7 +1061,9 @@
             <form id="completionForm">
                 <div class="form-group">
                     <label for="completionAuthor">Completed By</label>
-                    <input type="text" id="completionAuthor" placeholder="Enter your name..." required>
+                    <select id="completionAuthor" required>
+                        <option value="">Select team member...</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="completionComment">Completion Notes (Optional)</label>
@@ -1034,7 +1089,9 @@
             <form id="commentForm">
                 <div class="form-group">
                     <label for="commentAuthor">Your Name</label>
-                    <input type="text" id="commentAuthor" placeholder="Enter your name..." required>
+                    <select id="commentAuthor" required>
+                        <option value="">Select team member...</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="commentText">Comment</label>
@@ -1066,7 +1123,9 @@
                 </div>
                 <div class="form-group">
                     <label for="deleteAuthor">Deleted By</label>
-                    <input type="text" id="deleteAuthor" placeholder="Enter your name..." required>
+                    <select id="deleteAuthor" required>
+                        <option value="">Select team member...</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="deleteReason">Reason for Deletion</label>
@@ -1079,6 +1138,47 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Add Team Member Modal -->
+    <div id="addMemberModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add Team Member</h2>
+                <button class="close-btn" onclick="closeModal('addMemberModal')">&times;</button>
+            </div>
+            <form id="addMemberForm">
+                <div class="form-group">
+                    <label for="memberName">Member Name</label>
+                    <input type="text" id="memberName" placeholder="Enter team member name..." required>
+                </div>
+                <div class="form-group">
+                    <label for="memberRole">Role (Optional)</label>
+                    <input type="text" id="memberRole" placeholder="e.g., Developer, Designer, Tester...">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addMemberModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-user-plus"></i> Add Member
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Team Members Modal -->
+    <div id="teamMembersModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2>Team Members</h2>
+                <button class="close-btn" onclick="closeModal('teamMembersModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="teamMembersList">
+                    <!-- Team members will be populated here -->
+                </div>
+            </div>
         </div>
     </div>
 

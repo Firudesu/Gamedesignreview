@@ -132,6 +132,12 @@ class TaskManager {
             this.confirmDeleteTask();
         });
 
+        // Add team member form
+        document.getElementById('addMemberForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.addTeamMember();
+        });
+
         // Close modals when clicking outside
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('modal')) {
@@ -422,12 +428,14 @@ class TaskManager {
 
     async completeTaskWithComment() {
         const comment = document.getElementById('completionComment').value.trim();
-        const completedBy = document.getElementById('completionAuthor').value.trim();
+        const completedById = document.getElementById('completionAuthor').value;
         
-        if (!completedBy) {
-            this.showNotification('Please enter your name.', 'error');
+        if (!completedById) {
+            this.showNotification('Please select a team member.', 'error');
             return;
         }
+        
+        const completedBy = this.members.find(m => m.id === completedById)?.name || 'Unknown';
         
         try {
             // Find the task in the current game
@@ -474,17 +482,19 @@ class TaskManager {
 
     async addComment() {
         const commentText = document.getElementById('commentText').value.trim();
-        const commentAuthor = document.getElementById('commentAuthor').value.trim();
+        const commentAuthorId = document.getElementById('commentAuthor').value;
         
         if (!commentText) {
             this.showNotification('Please enter a comment.', 'error');
             return;
         }
         
-        if (!commentAuthor) {
-            this.showNotification('Please enter your name.', 'error');
+        if (!commentAuthorId) {
+            this.showNotification('Please select a team member.', 'error');
             return;
         }
+        
+        const commentAuthor = this.members.find(m => m.id === commentAuthorId)?.name || 'Unknown';
         
         try {
             // Find the task in the current game
@@ -550,11 +560,19 @@ class TaskManager {
 
     async confirmDeleteTask() {
         const deleteReason = document.getElementById('deleteReason').value.trim();
+        const deletedById = document.getElementById('deleteAuthor').value;
         
         if (!deleteReason) {
             this.showNotification('Please provide a reason for deletion.', 'error');
             return;
         }
+        
+        if (!deletedById) {
+            this.showNotification('Please select a team member.', 'error');
+            return;
+        }
+        
+        const deletedBy = this.members.find(m => m.id === deletedById)?.name || 'Unknown';
         
         if (this.currentTaskId) {
             try {
@@ -576,7 +594,7 @@ class TaskManager {
                     const deletedTask = {
                         ...taskToDelete,
                         deletedAt: new Date().toISOString(),
-                        deletedBy: document.getElementById('deleteAuthor').value.trim() || 'Unknown',
+                        deletedBy: deletedBy,
                         deleteReason: deleteReason
                     };
                     
@@ -679,6 +697,116 @@ class TaskManager {
             this.members.forEach(member => {
                 assigneeSelect.innerHTML += `<option value="${member.id}">${this.escapeHtml(member.name)}</option>`;
             });
+        }
+        
+        // Populate all member dropdowns
+        this.populateMemberDropdowns();
+    }
+
+    populateMemberDropdowns() {
+        const memberDropdowns = [
+            'completionAuthor',
+            'commentAuthor', 
+            'deleteAuthor'
+        ];
+        
+        memberDropdowns.forEach(dropdownId => {
+            const dropdown = document.getElementById(dropdownId);
+            if (dropdown) {
+                dropdown.innerHTML = '<option value="">Select team member...</option>';
+                this.members.forEach(member => {
+                    dropdown.innerHTML += `<option value="${member.id}">${this.escapeHtml(member.name)}</option>`;
+                });
+            }
+        });
+    }
+
+    showAddMemberModal() {
+        this.showModal('addMemberModal');
+    }
+
+    async addTeamMember() {
+        const memberName = document.getElementById('memberName').value.trim();
+        const memberRole = document.getElementById('memberRole').value.trim();
+        
+        if (!memberName) {
+            this.showNotification('Please enter a member name.', 'error');
+            return;
+        }
+        
+        try {
+            const member = {
+                id: Date.now().toString(),
+                name: memberName,
+                role: memberRole || null,
+                createdAt: new Date().toISOString()
+            };
+            
+            this.members.push(member);
+            
+            // Save to GitHub
+            await this.storage.saveMembers(this.members);
+            
+            // Update UI
+            this.populateFilters();
+            this.hideModal('addMemberModal');
+            document.getElementById('memberName').value = '';
+            document.getElementById('memberRole').value = '';
+            
+            this.showNotification('Team member added successfully!', 'success');
+        } catch (error) {
+            console.error('Error adding team member:', error);
+            this.showNotification('Error adding team member. Please try again.', 'error');
+        }
+    }
+
+    showTeamMembers() {
+        const teamMembersList = document.getElementById('teamMembersList');
+        
+        if (!this.members || this.members.length === 0) {
+            teamMembersList.innerHTML = '<p style="text-align: center; color: #64748b; padding: 2rem;">No team members found. Add your first team member to get started.</p>';
+        } else {
+            const teamMembersHtml = this.members.map(member => `
+                <div class="team-member-item">
+                    <div class="team-member-info">
+                        <h4>${this.escapeHtml(member.name)}</h4>
+                        ${member.role ? `<div class="team-member-role">${this.escapeHtml(member.role)}</div>` : ''}
+                    </div>
+                    <div class="team-member-actions">
+                        <button class="btn-remove-member" onclick="taskManager.removeTeamMember('${member.id}')">
+                            <i class="fas fa-trash"></i> Remove
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            
+            teamMembersList.innerHTML = teamMembersHtml;
+        }
+        
+        this.showModal('teamMembersModal');
+    }
+
+    async removeTeamMember(memberId) {
+        if (confirm('Are you sure you want to remove this team member? This action cannot be undone.')) {
+            try {
+                // Remove member from array
+                const index = this.members.findIndex(m => m.id === memberId);
+                if (index !== -1) {
+                    this.members.splice(index, 1);
+                    
+                    // Save to GitHub
+                    await this.storage.saveMembers(this.members);
+                    
+                    // Update UI
+                    this.populateFilters();
+                    this.showTeamMembers(); // Refresh the modal
+                    
+                    this.showNotification('Team member removed successfully!', 'success');
+                }
+            } catch (error) {
+                console.error('Error removing team member:', error);
+                this.showNotification('Error removing team member. Please try again.', 'error');
+            }
         }
     }
 
