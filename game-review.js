@@ -6,6 +6,7 @@ class TaskManager {
         this.tasks = [];
         this.members = [];
         this.taskToDelete = null;
+        this.currentTaskId = null; // Add missing property
         this.storage = new GitHubStorage();
         
         this.init();
@@ -90,6 +91,8 @@ class TaskManager {
         // Add task button
         document.getElementById('addTaskBtn').addEventListener('click', () => {
             this.showModal('addTaskModal');
+            // Initialize form fields when modal opens
+            this.updateTaskFormFields('bug');
         });
 
         // Add task form
@@ -133,6 +136,33 @@ class TaskManager {
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('modal')) {
                 this.hideModal(e.target.id);
+            }
+        });
+
+        // Event delegation for dynamically created task elements
+        document.addEventListener('click', (e) => {
+            // Task expansion
+            if (e.target.closest('.task-summary')) {
+                const taskCard = e.target.closest('.task-card');
+                const taskId = taskCard.dataset.taskId;
+                this.toggleTaskExpansion(taskId);
+            }
+            
+            // Task action buttons
+            if (e.target.closest('.task-btn')) {
+                const button = e.target.closest('.task-btn');
+                const taskCard = button.closest('.task-card');
+                const taskId = taskCard.dataset.taskId;
+                
+                if (button.classList.contains('complete')) {
+                    this.showCompletionModal(taskId);
+                } else if (button.classList.contains('comment')) {
+                    this.showCommentModal(taskId);
+                } else if (button.classList.contains('delete')) {
+                    this.showDeleteModal(taskId);
+                } else if (button.classList.contains('reopen')) {
+                    this.toggleTaskComplete(taskId);
+                }
             }
         });
     }
@@ -233,7 +263,7 @@ class TaskManager {
 
     resetTaskForm() {
         document.getElementById('addTaskForm').reset();
-        this.updateTaskFormFields('bug');
+        this.updateTaskFormFields('bug'); // Show fields by default
     }
 
     renderTasks() {
@@ -300,7 +330,7 @@ class TaskManager {
         return `
             <div class="task-card ${task.status === 'completed' ? 'completed' : ''}" data-task-id="${task.id}">
                 <!-- Summary View -->
-                <div class="task-summary" onclick="taskManager.toggleTaskExpansion('${task.id}')">
+                <div class="task-summary">
                     <div class="task-header">
                         <div class="task-title">${this.escapeHtml(task.title)}</div>
                         <div class="task-status-indicator">
@@ -354,17 +384,17 @@ class TaskManager {
                     
                     <div class="task-actions">
                         ${task.status === 'open' ? 
-                            `<button class="task-btn complete" onclick="taskManager.showCompletionModal('${task.id}')">
+                            `<button class="task-btn complete">
                                 <i class="fas fa-check"></i> Complete
                             </button>` :
-                            `<button class="task-btn reopen" onclick="taskManager.toggleTaskComplete('${task.id}')">
+                            `<button class="task-btn reopen">
                                 <i class="fas fa-undo"></i> Reopen
                             </button>`
                         }
-                        <button class="task-btn comment" onclick="taskManager.showCommentModal('${task.id}')">
+                        <button class="task-btn comment">
                             <i class="fas fa-comment"></i> Comment
                         </button>
-                        <button class="task-btn delete" onclick="taskManager.showDeleteModal('${task.id}')">
+                        <button class="task-btn delete">
                             <i class="fas fa-trash"></i> Delete
                         </button>
                     </div>
