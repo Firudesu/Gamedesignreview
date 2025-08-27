@@ -201,12 +201,12 @@
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
+            gap: 0.5rem;
         }
 
         .stat-item {
             text-align: center;
-            padding: 1rem;
+            padding: 0.75rem 0.5rem;
             background: rgba(248, 250, 252, 0.8);
             border-radius: 0.75rem;
             border: 1px solid rgba(226, 232, 240, 0.5);
@@ -214,14 +214,14 @@
 
         .stat-number {
             display: block;
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: 700;
             color: #1e293b;
             margin-bottom: 0.25rem;
         }
 
         .stat-label {
-            font-size: 0.875rem;
+            font-size: 0.75rem;
             color: #64748b;
             font-weight: 500;
         }
@@ -588,9 +588,21 @@
             margin-bottom: 0.5rem;
         }
 
+        .comment-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .comment-author {
+            color: #1e293b;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
         .comment-date {
             color: #64748b;
-            font-size: 0.875rem;
+            font-size: 0.75rem;
         }
 
         .comment-status {
@@ -774,7 +786,7 @@
                             <i class="fas fa-gamepad"></i> Controls
                         </button>
                         <button class="category-btn" data-category="quest">
-                            <i class="fas fa-quest"></i> Quests
+                            <i class="fas fa-scroll"></i> Quests
                         </button>
                         <button class="category-btn" data-category="review">
                             <i class="fas fa-star"></i> Reviews
@@ -933,6 +945,10 @@
             </div>
             <form id="completionForm">
                 <div class="form-group">
+                    <label for="completionAuthor">Completed By</label>
+                    <input type="text" id="completionAuthor" placeholder="Enter your name..." required>
+                </div>
+                <div class="form-group">
                     <label for="completionComment">Completion Notes (Optional)</label>
                     <textarea id="completionComment" placeholder="Describe what was fixed or completed..."></textarea>
                 </div>
@@ -954,6 +970,10 @@
                 <button class="close-btn" onclick="closeModal('commentModal')">&times;</button>
             </div>
             <form id="commentForm">
+                <div class="form-group">
+                    <label for="commentAuthor">Your Name</label>
+                    <input type="text" id="commentAuthor" placeholder="Enter your name..." required>
+                </div>
                 <div class="form-group">
                     <label for="commentText">Comment</label>
                     <textarea id="commentText" placeholder="Add a comment for clarification or additional information..." required></textarea>

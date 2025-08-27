@@ -108,7 +108,9 @@ class TaskManager {
 
         // Task action buttons
         document.getElementById('markCompleteBtn').addEventListener('click', () => {
-            this.showCompletionModal();
+            if (this.currentTaskId) {
+                this.showCompletionModal(this.currentTaskId);
+            }
         });
 
         document.getElementById('reopenTaskBtn').addEventListener('click', () => {
@@ -202,7 +204,8 @@ class TaskManager {
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
                 comments: [],
-                completionComment: null
+                completionComment: null,
+                completedBy: null
             };
 
             // Add task to current game
@@ -335,6 +338,12 @@ class TaskManager {
 
     async completeTaskWithComment() {
         const comment = document.getElementById('completionComment').value.trim();
+        const completedBy = document.getElementById('completionAuthor').value.trim();
+        
+        if (!completedBy) {
+            this.showNotification('Please enter your name.', 'error');
+            return;
+        }
         
         try {
             // Find the task in the current game
@@ -354,6 +363,7 @@ class TaskManager {
                 task.status = 'completed';
                 task.updatedAt = new Date().toISOString();
                 task.completionComment = comment;
+                task.completedBy = completedBy;
                 
                 // Save to GitHub
                 await this.saveData();
@@ -363,6 +373,7 @@ class TaskManager {
                 this.updateStatistics();
                 this.hideModal('completionModal');
                 document.getElementById('completionComment').value = '';
+                document.getElementById('completionAuthor').value = '';
                 
                 this.showNotification('Task completed successfully!', 'success');
             }
@@ -379,9 +390,15 @@ class TaskManager {
 
     async addComment() {
         const commentText = document.getElementById('commentText').value.trim();
+        const commentAuthor = document.getElementById('commentAuthor').value.trim();
         
         if (!commentText) {
             this.showNotification('Please enter a comment.', 'error');
+            return;
+        }
+        
+        if (!commentAuthor) {
+            this.showNotification('Please enter your name.', 'error');
             return;
         }
         
@@ -405,6 +422,7 @@ class TaskManager {
                 const comment = {
                     id: Date.now().toString(),
                     text: commentText,
+                    author: commentAuthor,
                     createdAt: new Date().toISOString(),
                     status: 'open' // open, resolved, closed
                 };
@@ -419,6 +437,7 @@ class TaskManager {
                 this.renderTasks();
                 this.hideModal('commentModal');
                 document.getElementById('commentText').value = '';
+                document.getElementById('commentAuthor').value = '';
                 
                 this.showNotification('Comment added successfully!', 'success');
             }
@@ -488,12 +507,16 @@ class TaskManager {
             
             // Show completion comment if exists
             const completionCommentDiv = document.getElementById('detailCompletionComment');
-            if (task.completionComment) {
+            if (task.completionComment || task.completedBy) {
                 completionCommentDiv.style.display = 'block';
-                completionCommentDiv.innerHTML = `
-                    <h4>Completion Notes:</h4>
-                    <p>${this.escapeHtml(task.completionComment)}</p>
-                `;
+                let completionHtml = '<h4>Completion Details:</h4>';
+                if (task.completedBy) {
+                    completionHtml += `<p><strong>Completed by:</strong> ${this.escapeHtml(task.completedBy)}</p>`;
+                }
+                if (task.completionComment) {
+                    completionHtml += `<p><strong>Notes:</strong> ${this.escapeHtml(task.completionComment)}</p>`;
+                }
+                completionCommentDiv.innerHTML = completionHtml;
             } else {
                 completionCommentDiv.style.display = 'none';
             }
@@ -531,7 +554,10 @@ class TaskManager {
         const commentsHtml = task.comments.map(comment => `
             <div class="comment-item ${comment.status}">
                 <div class="comment-header">
-                    <span class="comment-date">${new Date(comment.createdAt).toLocaleDateString()}</span>
+                    <div class="comment-meta">
+                        <span class="comment-author">${this.escapeHtml(comment.author || 'Anonymous')}</span>
+                        <span class="comment-date">${new Date(comment.createdAt).toLocaleDateString()}</span>
+                    </div>
                     <span class="comment-status ${comment.status}">${comment.status}</span>
                 </div>
                 <div class="comment-text">${this.escapeHtml(comment.text)}</div>
