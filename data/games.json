@@ -18,12 +18,13 @@
           "priority": "medium",
           "urgency": "medium",
           "assignee": "",
-          "status": "open",
+          "status": "completed",
           "createdAt": "2025-08-27T09:43:16.100Z",
-          "updatedAt": "2025-08-27T09:43:16.100Z",
+          "updatedAt": "2025-08-27T09:50:33.399Z",
           "comments": [],
-          "completionComment": null,
-          "completedBy": null
+          "completionComment": "fixed",
+          "completedBy": "Philip Pardoe",
+          "isExpanded": true
         }
       ],
       "quest": [],
