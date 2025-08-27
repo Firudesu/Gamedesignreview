@@ -138,6 +138,22 @@ class TaskManager {
             this.addTeamMember();
         });
 
+        // Team management buttons
+        document.getElementById('addMemberBtn').addEventListener('click', () => {
+            console.log('Add member button clicked');
+            this.showAddMemberModal();
+        });
+
+        document.getElementById('viewTeamMembersBtn').addEventListener('click', () => {
+            console.log('View team members button clicked');
+            this.showTeamMembers();
+        });
+
+        document.getElementById('viewDeletedTasksBtn').addEventListener('click', () => {
+            console.log('View deleted tasks button clicked');
+            this.showDeletedTasks();
+        });
+
         // Close modals when clicking outside
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('modal')) {
@@ -168,6 +184,15 @@ class TaskManager {
                     this.showDeleteModal(taskId);
                 } else if (button.classList.contains('reopen')) {
                     this.toggleTaskComplete(taskId);
+                }
+            }
+            
+            // Remove team member button
+            if (e.target.closest('.btn-remove-member')) {
+                const button = e.target.closest('.btn-remove-member');
+                const memberId = button.dataset.memberId;
+                if (memberId) {
+                    this.removeTeamMember(memberId);
                 }
             }
         });
@@ -722,6 +747,7 @@ class TaskManager {
     }
 
     showAddMemberModal() {
+        console.log('showAddMemberModal called');
         this.showModal('addMemberModal');
     }
 
@@ -761,6 +787,7 @@ class TaskManager {
     }
 
     showTeamMembers() {
+        console.log('showTeamMembers called');
         const teamMembersList = document.getElementById('teamMembersList');
         
         if (!this.members || this.members.length === 0) {
@@ -773,7 +800,7 @@ class TaskManager {
                         ${member.role ? `<div class="team-member-role">${this.escapeHtml(member.role)}</div>` : ''}
                     </div>
                     <div class="team-member-actions">
-                        <button class="btn-remove-member" onclick="taskManager.removeTeamMember('${member.id}')">
+                        <button class="btn-remove-member" data-member-id="${member.id}">
                             <i class="fas fa-trash"></i> Remove
                         </button>
                     </div>
@@ -811,6 +838,7 @@ class TaskManager {
     }
 
     showDeletedTasks() {
+        console.log('showDeletedTasks called');
         const deletedTasksList = document.getElementById('deletedTasksList');
         
         if (!this.currentGame.deletedTasks || this.currentGame.deletedTasks.length === 0) {
@@ -841,7 +869,14 @@ class TaskManager {
     }
 
     showModal(modalId) {
-        document.getElementById(modalId).classList.add('active');
+        console.log('showModal called with:', modalId);
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.add('active');
+            console.log('Modal activated:', modalId);
+        } else {
+            console.error('Modal not found:', modalId);
+        }
     }
 
     hideModal(modalId) {
