@@ -33,6 +33,11 @@ class TaskManager {
             return;
         }
 
+        // Initialize deleted tasks array if it doesn't exist
+        if (!this.currentGame.deletedTasks) {
+            this.currentGame.deletedTasks = [];
+        }
+
         // Update UI
         this.updateGameTitle();
         this.setupEventListeners();
@@ -106,21 +111,6 @@ class TaskManager {
             this.updateTaskFormFields(e.target.value);
         });
 
-        // Task action buttons
-        document.getElementById('markCompleteBtn').addEventListener('click', () => {
-            if (this.currentTaskId) {
-                this.showCompletionModal(this.currentTaskId);
-            }
-        });
-
-        document.getElementById('reopenTaskBtn').addEventListener('click', () => {
-            this.toggleTaskComplete();
-        });
-
-        document.getElementById('deleteTaskBtn').addEventListener('click', () => {
-            this.deleteTask();
-        });
-
         // Completion modal form
         document.getElementById('completionForm').addEventListener('submit', (e) => {
             e.preventDefault();
@@ -131,6 +121,12 @@ class TaskManager {
         document.getElementById('commentForm').addEventListener('submit', (e) => {
             e.preventDefault();
             this.addComment();
+        });
+
+        // Delete modal form
+        document.getElementById('deleteForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.confirmDeleteTask();
         });
 
         // Close modals when clicking outside
@@ -299,36 +295,94 @@ class TaskManager {
         const priorityText = task.priority ? task.priority.toUpperCase() : '';
         const assigneeName = task.assignee ? this.members.find(m => m.id === task.assignee)?.name : null;
         const commentCount = task.comments ? task.comments.length : 0;
+        const isExpanded = task.isExpanded || false;
         
         return `
-            <div class="task-card ${task.status === 'completed' ? 'completed' : ''}" onclick="taskManager.openTaskDetail('${task.id}')">
-                <div class="task-header">
-                    <div class="task-title">${this.escapeHtml(task.title)}</div>
+            <div class="task-card ${task.status === 'completed' ? 'completed' : ''}" data-task-id="${task.id}">
+                <!-- Summary View -->
+                <div class="task-summary" onclick="taskManager.toggleTaskExpansion('${task.id}')">
+                    <div class="task-header">
+                        <div class="task-title">${this.escapeHtml(task.title)}</div>
+                        <div class="task-status-indicator">
+                            ${task.status === 'completed' ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-circle"></i>'}
+                        </div>
+                    </div>
+                    <div class="task-meta">
+                        ${priorityText ? `<span class="${priorityClass}">${priorityText}</span>` : ''}
+                        ${assigneeName ? `<span class="task-assignee">Assigned to ${this.escapeHtml(assigneeName)}</span>` : ''}
+                        ${commentCount > 0 ? `<span class="task-comments"><i class="fas fa-comments"></i> ${commentCount}</span>` : ''}
+                        <span class="task-date">${new Date(task.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    <div class="task-description-summary">
+                        ${this.escapeHtml(task.description || 'No description').substring(0, 100)}${(task.description && task.description.length > 100) ? '...' : ''}
+                    </div>
+                    <div class="expand-indicator">
+                        <i class="fas fa-chevron-${isExpanded ? 'up' : 'down'}"></i>
+                    </div>
                 </div>
-                <div class="task-meta">
-                    ${priorityText ? `<span class="${priorityClass}">${priorityText}</span>` : ''}
-                    ${assigneeName ? `<span class="task-assignee">Assigned to ${this.escapeHtml(assigneeName)}</span>` : ''}
-                    ${commentCount > 0 ? `<span class="task-comments"><i class="fas fa-comments"></i> ${commentCount}</span>` : ''}
-                </div>
-                <div class="task-description">${this.escapeHtml(task.description || 'No description')}</div>
-                <div class="task-actions">
-                    ${task.status === 'open' ? 
-                        `<button class="task-btn complete" onclick="event.stopPropagation(); taskManager.showCompletionModal('${task.id}')">
-                            <i class="fas fa-check"></i> Complete
-                        </button>` :
-                        `<button class="task-btn reopen" onclick="event.stopPropagation(); taskManager.toggleTaskComplete('${task.id}')">
-                            <i class="fas fa-undo"></i> Reopen
-                        </button>`
-                    }
-                    <button class="task-btn comment" onclick="event.stopPropagation(); taskManager.showCommentModal('${task.id}')">
-                        <i class="fas fa-comment"></i> Comment
-                    </button>
-                    <button class="task-btn delete" onclick="event.stopPropagation(); taskManager.deleteTask('${task.id}')">
-                        <i class="fas fa-trash"></i> Delete
-                    </button>
+                
+                <!-- Expanded View -->
+                <div class="task-expanded ${isExpanded ? 'expanded' : ''}" style="display: ${isExpanded ? 'block' : 'none'};">
+                    <div class="task-full-description">
+                        <h4>Full Description:</h4>
+                        <p>${this.escapeHtml(task.description || 'No description')}</p>
+                    </div>
+                    
+                    ${task.completionComment || task.completedBy ? `
+                        <div class="completion-details">
+                            <h4>Completion Details:</h4>
+                            ${task.completedBy ? `<p><strong>Completed by:</strong> ${this.escapeHtml(task.completedBy)}</p>` : ''}
+                            ${task.completionComment ? `<p><strong>Notes:</strong> ${this.escapeHtml(task.completionComment)}</p>` : ''}
+                        </div>
+                    ` : ''}
+                    
+                    ${task.comments && task.comments.length > 0 ? `
+                        <div class="task-comments-section">
+                            <h4>Comments (${task.comments.length}):</h4>
+                            ${task.comments.map(comment => `
+                                <div class="comment-item ${comment.status}">
+                                    <div class="comment-header">
+                                        <span class="comment-author">${this.escapeHtml(comment.author || 'Anonymous')}</span>
+                                        <span class="comment-date">${new Date(comment.createdAt).toLocaleDateString()}</span>
+                                        <span class="comment-status ${comment.status}">${comment.status}</span>
+                                    </div>
+                                    <div class="comment-text">${this.escapeHtml(comment.text)}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                    
+                    <div class="task-actions">
+                        ${task.status === 'open' ? 
+                            `<button class="task-btn complete" onclick="taskManager.showCompletionModal('${task.id}')">
+                                <i class="fas fa-check"></i> Complete
+                            </button>` :
+                            `<button class="task-btn reopen" onclick="taskManager.toggleTaskComplete('${task.id}')">
+                                <i class="fas fa-undo"></i> Reopen
+                            </button>`
+                        }
+                        <button class="task-btn comment" onclick="taskManager.showCommentModal('${task.id}')">
+                            <i class="fas fa-comment"></i> Comment
+                        </button>
+                        <button class="task-btn delete" onclick="taskManager.showDeleteModal('${task.id}')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
                 </div>
             </div>
         `;
+    }
+
+    toggleTaskExpansion(taskId) {
+        // Find the task and toggle its expanded state
+        for (const tasks of Object.values(this.currentGame.issues || {})) {
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                task.isExpanded = !task.isExpanded;
+                this.renderTasks(); // Re-render to show the change
+                break;
+            }
+        }
     }
 
     showCompletionModal(taskId) {
@@ -447,6 +501,82 @@ class TaskManager {
         }
     }
 
+    showDeleteModal(taskId) {
+        this.currentTaskId = taskId;
+        
+        // Find the task to get its name
+        let taskName = 'Unknown Task';
+        for (const tasks of Object.values(this.currentGame.issues || {})) {
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                taskName = task.title;
+                break;
+            }
+        }
+        
+        document.getElementById('deleteTaskName').textContent = taskName;
+        this.showModal('deleteTaskModal');
+    }
+
+    async confirmDeleteTask() {
+        const deleteReason = document.getElementById('deleteReason').value.trim();
+        
+        if (!deleteReason) {
+            this.showNotification('Please provide a reason for deletion.', 'error');
+            return;
+        }
+        
+        if (this.currentTaskId) {
+            try {
+                // Find the task to be deleted
+                let taskToDelete = null;
+                let category = null;
+                
+                for (const [cat, tasks] of Object.entries(this.currentGame.issues || {})) {
+                    const foundTask = tasks.find(t => t.id === this.currentTaskId);
+                    if (foundTask) {
+                        taskToDelete = foundTask;
+                        category = cat;
+                        break;
+                    }
+                }
+                
+                if (taskToDelete) {
+                    // Add to deleted tasks with reason
+                    const deletedTask = {
+                        ...taskToDelete,
+                        deletedAt: new Date().toISOString(),
+                        deletedBy: document.getElementById('deleteAuthor').value.trim() || 'Unknown',
+                        deleteReason: deleteReason
+                    };
+                    
+                    this.currentGame.deletedTasks.push(deletedTask);
+                    
+                    // Remove from active tasks
+                    const index = this.currentGame.issues[category].findIndex(t => t.id === this.currentTaskId);
+                    if (index !== -1) {
+                        this.currentGame.issues[category].splice(index, 1);
+                    }
+                    
+                    // Save to GitHub
+                    await this.saveData();
+                    
+                    // Update UI
+                    this.renderTasks();
+                    this.updateStatistics();
+                    this.hideModal('deleteTaskModal');
+                    document.getElementById('deleteReason').value = '';
+                    document.getElementById('deleteAuthor').value = '';
+                    
+                    this.showNotification('Task deleted successfully!', 'success');
+                }
+            } catch (error) {
+                console.error('Error deleting task:', error);
+                this.showNotification('Error deleting task. Please try again.', 'error');
+            }
+        }
+    }
+
     async toggleTaskComplete(taskId) {
         try {
             // Find the task in the current game
@@ -466,6 +596,12 @@ class TaskManager {
                 task.status = task.status === 'completed' ? 'open' : 'completed';
                 task.updatedAt = new Date().toISOString();
                 
+                // Clear completion details if reopening
+                if (task.status === 'open') {
+                    task.completionComment = null;
+                    task.completedBy = null;
+                }
+                
                 // Save to GitHub
                 await this.saveData();
                 
@@ -481,187 +617,6 @@ class TaskManager {
         } catch (error) {
             console.error('Error toggling task completion:', error);
             this.showNotification('Error updating task. Please try again.', 'error');
-        }
-    }
-
-    openTaskDetail(taskId) {
-        // Find the task
-        let task = null;
-        
-        for (const tasks of Object.values(this.currentGame.issues || {})) {
-            const foundTask = tasks.find(t => t.id === taskId);
-            if (foundTask) {
-                task = foundTask;
-                break;
-            }
-        }
-        
-        if (task) {
-            // Update modal content
-            document.getElementById('detailTaskTitle').textContent = task.title;
-            document.getElementById('detailTaskStatus').textContent = task.status;
-            document.getElementById('detailTaskPriority').textContent = task.priority || 'N/A';
-            document.getElementById('detailTaskAssignee').textContent = 
-                task.assignee ? this.members.find(m => m.id === task.assignee)?.name || 'Unknown' : 'Unassigned';
-            document.getElementById('detailTaskDescription').textContent = task.description || 'No description';
-            
-            // Show completion comment if exists
-            const completionCommentDiv = document.getElementById('detailCompletionComment');
-            if (task.completionComment || task.completedBy) {
-                completionCommentDiv.style.display = 'block';
-                let completionHtml = '<h4>Completion Details:</h4>';
-                if (task.completedBy) {
-                    completionHtml += `<p><strong>Completed by:</strong> ${this.escapeHtml(task.completedBy)}</p>`;
-                }
-                if (task.completionComment) {
-                    completionHtml += `<p><strong>Notes:</strong> ${this.escapeHtml(task.completionComment)}</p>`;
-                }
-                completionCommentDiv.innerHTML = completionHtml;
-            } else {
-                completionCommentDiv.style.display = 'none';
-            }
-            
-            // Render comments
-            this.renderComments(task);
-            
-            // Show/hide action buttons based on task status
-            const markCompleteBtn = document.getElementById('markCompleteBtn');
-            const reopenTaskBtn = document.getElementById('reopenTaskBtn');
-            
-            if (task.status === 'open') {
-                markCompleteBtn.style.display = 'inline-flex';
-                reopenTaskBtn.style.display = 'none';
-            } else {
-                markCompleteBtn.style.display = 'none';
-                reopenTaskBtn.style.display = 'inline-flex';
-            }
-            
-            // Store current task ID for actions
-            this.currentTaskId = taskId;
-            
-            this.showModal('taskDetailModal');
-        }
-    }
-
-    renderComments(task) {
-        const commentsContainer = document.getElementById('taskComments');
-        
-        if (!task.comments || task.comments.length === 0) {
-            commentsContainer.innerHTML = '<p class="no-comments">No comments yet</p>';
-            return;
-        }
-        
-        const commentsHtml = task.comments.map(comment => `
-            <div class="comment-item ${comment.status}">
-                <div class="comment-header">
-                    <div class="comment-meta">
-                        <span class="comment-author">${this.escapeHtml(comment.author || 'Anonymous')}</span>
-                        <span class="comment-date">${new Date(comment.createdAt).toLocaleDateString()}</span>
-                    </div>
-                    <span class="comment-status ${comment.status}">${comment.status}</span>
-                </div>
-                <div class="comment-text">${this.escapeHtml(comment.text)}</div>
-                ${comment.status === 'open' ? `
-                    <div class="comment-actions">
-                        <button class="btn btn-sm btn-success" onclick="taskManager.resolveComment('${task.id}', '${comment.id}')">
-                            <i class="fas fa-check"></i> Resolve
-                        </button>
-                        <button class="btn btn-sm btn-secondary" onclick="taskManager.closeComment('${task.id}', '${comment.id}')">
-                            <i class="fas fa-times"></i> Close
-                        </button>
-                    </div>
-                ` : ''}
-            </div>
-        `).join('');
-        
-        commentsContainer.innerHTML = commentsHtml;
-    }
-
-    async resolveComment(taskId, commentId) {
-        await this.updateCommentStatus(taskId, commentId, 'resolved');
-    }
-
-    async closeComment(taskId, commentId) {
-        await this.updateCommentStatus(taskId, commentId, 'closed');
-    }
-
-    async updateCommentStatus(taskId, commentId, status) {
-        try {
-            // Find the task and comment
-            let task = null;
-            
-            for (const tasks of Object.values(this.currentGame.issues || {})) {
-                const foundTask = tasks.find(t => t.id === taskId);
-                if (foundTask) {
-                    task = foundTask;
-                    break;
-                }
-            }
-            
-            if (task && task.comments) {
-                const comment = task.comments.find(c => c.id === commentId);
-                if (comment) {
-                    comment.status = status;
-                    task.updatedAt = new Date().toISOString();
-                    
-                    // Save to GitHub
-                    await this.saveData();
-                    
-                    // Update UI
-                    this.renderComments(task);
-                    this.renderTasks();
-                    
-                    this.showNotification(`Comment ${status} successfully!`, 'success');
-                }
-            }
-        } catch (error) {
-            console.error('Error updating comment status:', error);
-            this.showNotification('Error updating comment. Please try again.', 'error');
-        }
-    }
-
-    async deleteTask(taskId) {
-        this.taskToDelete = taskId;
-        
-        // Find the task to get its name
-        let taskName = 'Unknown Task';
-        for (const tasks of Object.values(this.currentGame.issues || {})) {
-            const task = tasks.find(t => t.id === taskId);
-            if (task) {
-                taskName = task.title;
-                break;
-            }
-        }
-        
-        document.getElementById('deleteTaskName').textContent = taskName;
-        this.showModal('deleteTaskModal');
-    }
-
-    async confirmDeleteTask() {
-        if (this.taskToDelete) {
-            try {
-                // Remove task from current game
-                for (const [category, tasks] of Object.entries(this.currentGame.issues || {})) {
-                    const index = tasks.findIndex(t => t.id === this.taskToDelete);
-                    if (index !== -1) {
-                        tasks.splice(index, 1);
-                        break;
-                    }
-                }
-                
-                // Save to GitHub
-                await this.saveData();
-                
-                // Update UI
-                this.renderTasks();
-                this.updateStatistics();
-                this.hideModal('deleteTaskModal');
-                this.showNotification('Task deleted successfully!', 'success');
-                this.taskToDelete = null;
-            } catch (error) {
-                console.error('Error deleting task:', error);
-                this.showNotification('Error deleting task. Please try again.', 'error');
-            }
         }
     }
 
@@ -695,6 +650,36 @@ class TaskManager {
                 assigneeSelect.innerHTML += `<option value="${member.id}">${this.escapeHtml(member.name)}</option>`;
             });
         }
+    }
+
+    showDeletedTasks() {
+        const deletedTasksList = document.getElementById('deletedTasksList');
+        
+        if (!this.currentGame.deletedTasks || this.currentGame.deletedTasks.length === 0) {
+            deletedTasksList.innerHTML = '<p style="text-align: center; color: #64748b; padding: 2rem;">No deleted tasks found.</p>';
+        } else {
+            const deletedTasksHtml = this.currentGame.deletedTasks.map(task => `
+                <div class="deleted-task-item">
+                    <div class="deleted-task-header">
+                        <h4>${this.escapeHtml(task.title)}</h4>
+                        <span class="deleted-date">Deleted: ${new Date(task.deletedAt).toLocaleDateString()}</span>
+                    </div>
+                    <div class="deleted-task-details">
+                        <p><strong>Category:</strong> ${task.category}</p>
+                        <p><strong>Description:</strong> ${this.escapeHtml(task.description || 'No description')}</p>
+                        <p><strong>Deleted by:</strong> ${this.escapeHtml(task.deletedBy)}</p>
+                        <p><strong>Reason:</strong> ${this.escapeHtml(task.deleteReason)}</p>
+                        ${task.comments && task.comments.length > 0 ? `
+                            <p><strong>Comments:</strong> ${task.comments.length} comment(s)</p>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+            
+            deletedTasksList.innerHTML = deletedTasksHtml;
+        }
+        
+        this.showModal('deletedTasksModal');
     }
 
     showModal(modalId) {

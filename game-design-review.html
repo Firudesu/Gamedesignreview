@@ -259,10 +259,10 @@
         .task-card {
             background: rgba(248, 250, 252, 0.8);
             border-radius: 1rem;
-            padding: 1.5rem;
             border: 1px solid rgba(226, 232, 240, 0.5);
             transition: all 0.3s ease;
             position: relative;
+            overflow: hidden;
         }
 
         .task-card:hover {
@@ -277,21 +277,121 @@
             border-color: rgba(16, 185, 129, 0.3);
         }
 
-        .task-card.completed::before {
-            content: '✓';
+        .task-summary {
+            padding: 1.5rem;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .task-summary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .task-status-indicator {
             position: absolute;
             top: 1rem;
             right: 1rem;
-            background: #10b981;
-            color: white;
-            width: 2rem;
-            height: 2rem;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
             font-size: 1.2rem;
+        }
+
+        .task-status-indicator .fa-check-circle {
+            color: #10b981;
+        }
+
+        .task-status-indicator .fa-circle {
+            color: #64748b;
+        }
+
+        .task-description-summary {
+            color: #64748b;
+            line-height: 1.6;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+
+        .expand-indicator {
+            text-align: center;
+            margin-top: 1rem;
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        .task-expanded {
+            background: rgba(255, 255, 255, 0.5);
+            border-top: 1px solid rgba(226, 232, 240, 0.5);
+            padding: 1.5rem;
+        }
+
+        .task-full-description h4,
+        .completion-details h4,
+        .task-comments-section h4 {
+            color: #1e293b;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .task-full-description p,
+        .completion-details p {
+            color: #374151;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .task-comments-section {
+            margin-top: 1.5rem;
+        }
+
+        .task-comments-section .comment-item {
+            background: rgba(248, 250, 252, 0.8);
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+            border: 1px solid rgba(226, 232, 240, 0.5);
+        }
+
+        .task-date {
+            color: #94a3b8;
+            font-size: 0.75rem;
+        }
+
+        .deleted-task-item {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .deleted-task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .deleted-task-header h4 {
+            color: #dc2626;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .deleted-date {
+            color: #94a3b8;
+            font-size: 0.875rem;
+        }
+
+        .deleted-task-details p {
+            color: #374151;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .deleted-task-details strong {
+            color: #1e293b;
         }
 
         .task-header {
@@ -811,6 +911,13 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="sidebar-section">
+                    <h3><i class="fas fa-archive"></i> Deleted Tasks</h3>
+                    <button class="btn btn-secondary" onclick="taskManager.showDeletedTasks()" style="width: 100%;">
+                        <i class="fas fa-trash"></i> View Deleted Tasks
+                    </button>
+                </div>
             </aside>
 
             <!-- Main Area -->
@@ -889,52 +996,7 @@
         </div>
     </div>
 
-    <!-- Task Detail Modal -->
-    <div id="taskDetailModal" class="modal">
-        <div class="modal-content" style="max-width: 700px;">
-            <div class="modal-header">
-                <h2 id="detailTaskTitle">Task Title</h2>
-                <button class="close-btn" onclick="closeModal('taskDetailModal')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="task-detail-content">
-                    <div class="task-info">
-                        <div class="task-meta">
-                            <span class="task-status" id="detailTaskStatus">Open</span>
-                            <span class="task-priority" id="detailTaskPriority">Medium</span>
-                            <span class="task-assignee" id="detailTaskAssignee">Unassigned</span>
-                        </div>
-                        <div class="task-description" id="detailTaskDescription">
-                            Task description will appear here...
-                        </div>
-                        <div id="detailCompletionComment" class="completion-notes" style="display: none;">
-                            <!-- Completion notes will be populated here -->
-                        </div>
-                    </div>
-                    
-                    <!-- Comments Section -->
-                    <div class="comment-section">
-                        <h3><i class="fas fa-comments"></i> Comments</h3>
-                        <div id="taskComments">
-                            <!-- Comments will be populated here -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('taskDetailModal')">Close</button>
-                <button type="button" class="btn btn-success" id="markCompleteBtn" style="display: none;">
-                    <i class="fas fa-check"></i> Mark as Complete
-                </button>
-                <button type="button" class="btn btn-primary" id="reopenTaskBtn" style="display: none;">
-                    <i class="fas fa-undo"></i> Reopen Task
-                </button>
-                <button type="button" class="btn btn-danger" id="deleteTaskBtn">
-                    <i class="fas fa-trash"></i> Delete Task
-                </button>
-            </div>
-        </div>
-    </div>
+
 
     <!-- Completion Modal -->
     <div id="completionModal" class="modal">
@@ -995,17 +1057,42 @@
                 <h2>Delete Task</h2>
                 <button class="close-btn" onclick="closeModal('deleteTaskModal')">&times;</button>
             </div>
-            <div style="padding: 1rem 0;">
-                <p style="color: #64748b; margin-bottom: 1.5rem; line-height: 1.6;">
-                    Are you sure you want to delete "<span id="deleteTaskName" style="font-weight: 600; color: #1e293b;"></span>"? 
-                    This action cannot be undone.
-                </p>
+            <form id="deleteForm">
+                <div style="padding: 1rem 0;">
+                    <p style="color: #64748b; margin-bottom: 1.5rem; line-height: 1.6;">
+                        Are you sure you want to delete "<span id="deleteTaskName" style="font-weight: 600; color: #1e293b;"></span>"? 
+                        This action cannot be undone.
+                    </p>
+                </div>
+                <div class="form-group">
+                    <label for="deleteAuthor">Deleted By</label>
+                    <input type="text" id="deleteAuthor" placeholder="Enter your name..." required>
+                </div>
+                <div class="form-group">
+                    <label for="deleteReason">Reason for Deletion</label>
+                    <textarea id="deleteReason" placeholder="Please provide a reason for deleting this task..." required></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('deleteTaskModal')">Cancel</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Delete Task
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Deleted Tasks Modal -->
+    <div id="deletedTasksModal" class="modal">
+        <div class="modal-content" style="max-width: 800px; max-height: 80vh;">
+            <div class="modal-header">
+                <h2>Deleted Tasks</h2>
+                <button class="close-btn" onclick="closeModal('deletedTasksModal')">&times;</button>
             </div>
-            <div class="form-actions">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('deleteTaskModal')">Cancel</button>
-                <button type="button" class="btn btn-danger" onclick="taskManager.confirmDeleteTask()">
-                    <i class="fas fa-trash"></i> Delete Task
-                </button>
+            <div class="modal-body">
+                <div id="deletedTasksList">
+                    <!-- Deleted tasks will be populated here -->
+                </div>
             </div>
         </div>
     </div>
