@@ -32,6 +32,22 @@
           "completionComment": null,
           "completedBy": null,
           "isExpanded": true
+        },
+        {
+          "id": "1756381550256",
+          "title": "Movement issue",
+          "description": "",
+          "category": "bug",
+          "priority": "medium",
+          "urgency": "medium",
+          "assignee": "",
+          "status": "open",
+          "createdAt": "2025-08-28T11:45:50.256Z",
+          "updatedAt": "2025-08-28T11:45:50.256Z",
+          "comments": [],
+          "completionComment": null,
+          "completedBy": null,
+          "mediaLinks": []
         }
       ],
       "controls": [
@@ -54,7 +70,8 @@
               "url": "https://www.youtube.com/watch?v=N9ySFldKrbo&t=3858s",
               "type": "video"
             }
-          ]
+          ],
+          "isExpanded": false
         }
       ],
       "quest": [],
