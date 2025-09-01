@@ -114,5 +114,20 @@
         "deleteReason": "fixed"
       }
     ]
+  },
+  {
+    "id": "1756723767554",
+    "name": "smurf",
+    "description": "",
+    "genre": "",
+    "completed": false,
+    "createdAt": "2025-09-01T10:49:27.554Z",
+    "updatedAt": "2025-09-01T10:49:27.554Z",
+    "issues": {
+      "bug": [],
+      "controls": [],
+      "quest": [],
+      "review": []
+    }
   }
 ]
