@@ -48,6 +48,22 @@
           "completionComment": null,
           "completedBy": null,
           "mediaLinks": []
+        },
+        {
+          "id": "1756720519099",
+          "title": "Movement issue",
+          "description": "test",
+          "category": "bug",
+          "priority": "medium",
+          "urgency": "medium",
+          "assignee": "",
+          "status": "open",
+          "createdAt": "2025-09-01T09:55:19.099Z",
+          "updatedAt": "2025-09-01T09:55:19.099Z",
+          "comments": [],
+          "completionComment": null,
+          "completedBy": null,
+          "mediaLinks": []
         }
       ],
       "controls": [
