@@ -4,9 +4,9 @@
     "name": "Test",
     "description": "",
     "genre": "",
-    "completed": false,
+    "completed": true,
     "createdAt": "2025-08-27T09:43:04.204Z",
-    "updatedAt": "2025-08-27T09:52:46.970Z",
+    "updatedAt": "2025-09-01T09:52:39.352Z",
     "issues": {
       "bug": [
         {
