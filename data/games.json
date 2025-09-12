@@ -124,10 +124,28 @@
     "createdAt": "2025-09-01T10:49:27.554Z",
     "updatedAt": "2025-09-01T10:49:27.554Z",
     "issues": {
-      "bug": [],
+      "bug": [
+        {
+          "id": "1757669892114",
+          "title": "Movement issue",
+          "description": "test",
+          "category": "bug",
+          "priority": "medium",
+          "urgency": "medium",
+          "assignee": "1756123446705",
+          "status": "open",
+          "createdAt": "2025-09-12T09:38:12.114Z",
+          "updatedAt": "2025-09-12T09:38:12.114Z",
+          "comments": [],
+          "completionComment": null,
+          "completedBy": null,
+          "mediaLinks": []
+        }
+      ],
       "controls": [],
       "quest": [],
       "review": []
-    }
+    },
+    "deletedTasks": []
   }
 ]
